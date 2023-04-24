@@ -2,7 +2,7 @@
  * tabs - consonant v6
  * https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/Tab_Role
  */
-import { createTag } from '../../utils/utils.js';
+const { createTag } = await import(`${getLibs()}/utils/utils.js`);
 
 const isElementInContainerView = (targetEl) => {
   const rect = targetEl.getBoundingClientRect();
@@ -99,9 +99,6 @@ const handleDeferredImages = (block) => {
 }
 
 const init = (block) => {
-
-  console.log("hii");
-
   const rootElem = block.closest('.fragment') || document;
   const rows = block.querySelectorAll(':scope > div');
   const parentSection = block.closest('.section');
