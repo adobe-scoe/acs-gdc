@@ -2,6 +2,9 @@
  * tabs - consonant v6
  * https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/Tab_Role
  */
+
+import { getLibs } from './utils.js';
+
 const { createTag } = await import(`${getLibs()}/utils/utils.js`);
 
 const isElementInContainerView = (targetEl) => {
