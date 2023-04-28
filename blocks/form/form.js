@@ -145,11 +145,11 @@ async function createForm(formURL) {
     console.debug('currentdate - ', currentDate)
     if (currentDate >= startDate && currentDate <endDate){
         //TODO set a flag 
-        console.debug('current date in range , nomition open')
+        console.debug('current date in range , nomination open')
         nominationOpen = true;
     }else {
         //TODO unset a flag 
-        console.debug('current date not range , nomition closed')
+        console.debug('current date not range , nomination closed')
         nominationOpen = false;
     }
 
