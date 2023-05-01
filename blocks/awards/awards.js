@@ -6,7 +6,7 @@
 import { getLibs } from '../../scripts/utils.js';
 
 const { createTag } = await import(`${getLibs()}/utils/utils.js`);
-
+var excelData;
 const isElementInContainerView = (targetEl) => {
   const rect = targetEl.getBoundingClientRect();
   const docEl = document.documentElement;
@@ -25,20 +25,32 @@ const scrollTabIntoView = (e) => {
 };
 
 function changeTabs(e) {
-  const { target } = e;
-  const parent = target.parentNode;
-  const grandparent = parent.parentNode.nextElementSibling;
-  parent
-    .querySelectorAll('[aria-selected="true"]')
-    .forEach((t) => t.setAttribute('aria-selected', false));
-  target.setAttribute('aria-selected', true);
-  scrollTabIntoView(target);
-  grandparent
-    .querySelectorAll('[role="tabpanel"]')
-    .forEach((p) => p.setAttribute('hidden', true));
-  grandparent.parentNode
-    .querySelector(`#${target.getAttribute('aria-controls')}`)
-    .removeAttribute('hidden');
+  if (excelData == undefined) {
+    setTimeout(function () {
+      changeTabs(e);
+    }, 100);
+  }
+  else {
+    const { target } = e;
+    let awardsTitle = target.textContent;
+    let winnerFilter = { "Quarter": "Q1", "Status (Approved/Winner)": "Winner", "Award Title-": awardsTitle };
+    let quarterWinnerData = getFilteredData(excelData, winnerFilter);
+    let nomineeFilter = { "Quarter": "Q1", "Status (Approved/Winner)": "Nominated", "Award Title-": awardsTitle };
+    let quarterNomineeData = getFilteredData(excelData, nomineeFilter);
+    const parent = target.parentNode;
+    const grandparent = parent.parentNode.nextElementSibling;
+    parent
+      .querySelectorAll('[aria-selected="true"]')
+      .forEach((t) => t.setAttribute('aria-selected', false));
+    target.setAttribute('aria-selected', true);
+    scrollTabIntoView(target);
+    grandparent
+      .querySelectorAll('[role="tabpanel"]')
+      .forEach((p) => p.setAttribute('hidden', true));
+    let tabPanel = grandparent.parentNode.querySelector(`#${target.getAttribute('aria-controls')}`);
+    tabPanel.innerHTML = createResultDiv(quarterWinnerData, quarterNomineeData);
+    tabPanel.removeAttribute('hidden');
+  }
 }
 
 function getStringKeyName(str) {
@@ -174,6 +186,9 @@ const init = (block) => {
     const rows = sectionMetadata.querySelectorAll(':scope > div');
     rows.forEach((row) => {
       const key = getStringKeyName(row.children[0].textContent);
+      if (key == 'path') {
+        fetchData(row.children[1].textContent);
+      }
       if (key !== 'tab') return;
       let val = getStringKeyName(row.children[1].textContent);
       if (!val) return;
@@ -194,5 +209,58 @@ const init = (block) => {
   handleDeferredImages(block);
   initTabs(block, config, rootElem);
 };
+async function fetchData(path) {
+  const response = await fetch(path);
+  const jsonData = await response.json();
+  excelData = jsonData.data;
+  excelData.shift();
+}
 
+function getFilteredData(data, filterName) {
+  for (let [key, value] of Object.entries(filterName)) {
+    data = data.filter(function (entry) {
+      return entry[key] === value;
+    });
+  }
+  return data;
+}
+
+function createResultDiv(quarterWinnerData, quarterNomineeData) {
+  let content = "";
+  if (quarterWinnerData.length) {
+    let winnerData = quarterWinnerData ? quarterWinnerData[0] : {};
+    let nomineeContent = "";
+    for (let nomineeData of quarterNomineeData) {
+      nomineeContent += createNomineeDiv(nomineeData);
+    }
+    let nomineeSection = quarterNomineeData.length ? "<h4 class=\"award-result-sub-heading\">Other Nominees</h4>" +
+      "<section class=\"award-result-nominees\">" +
+      nomineeContent +
+      "</section>" : "";
+    content = "<div class=\"award-result\">" +
+      "<h2 class=\"award-result-heading\">" + winnerData["Award Title-"] + "</h2>" +
+      "<section class=\"award-result-winner\">" +
+      "    <img class=\"award-result-winner-photo\" src=\"" + winnerData["Image"] + "\" alt=\"Trulli\" width=\"400\" height=\"300\">" +
+      "    <section class=\"award-result-winner-details\">" +
+      "        <span class=\"position\">" + winnerData["Position"] + ", " + winnerData["ACS Function"] + "</span>" +
+      "        <span class=\"name\">" + winnerData["Name of Employee/Team (As per workday)"] + "</span>" +
+      "        <span class=\"description\">" + winnerData["Citation to be mentioned on slide (max 100 words)"] + "</span>" +
+      "    </section>" +
+      "</section>" +
+      nomineeSection +
+      "</div>";
+  }
+  return content;
+}
+
+function createNomineeDiv(nomineeData) {
+  let content = "<section class=\"award-result-nominee\">" +
+    "        <img class=\"award-result-nominee-photo\" src=\"" + nomineeData["Image"] + "\" alt=\"Trulli\" width=\"74\" height=\"72\">" +
+    "        <section class=\"award-result-nominee-details\">" +
+    "            <span class=\"position\">" + nomineeData["Position"] + ", " + nomineeData["ACS Function"] + "</span>" +
+    "            <span class=\"name\">" + nomineeData["Name of Employee/Team (As per workday)"] + "</span>" +
+    "        </section>" +
+    "    </section>";
+  return content;
+}
 export default init;
