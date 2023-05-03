@@ -7,6 +7,9 @@ import { getLibs } from '../../scripts/utils.js';
 
 const { createTag } = await import(`${getLibs()}/utils/utils.js`);
 var excelData;
+var quarter;
+const d = new Date();
+const year = d.getFullYear().toString();
 const isElementInContainerView = (targetEl) => {
   const rect = targetEl.getBoundingClientRect();
   const docEl = document.documentElement;
@@ -23,7 +26,12 @@ const scrollTabIntoView = (e) => {
   /* c8 ignore next */
   if (!isElInView) e.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
 };
-
+function changeQuarterTabs(e) {
+  const { target } = e;
+  quarter = target.textContent;
+  const tabContent = target.getAttribute('aria-controls');
+  document.querySelector(`.quarter-tabs > .tab-content #${tabContent} [role="tab"]`).click();
+}
 function changeTabs(e) {
   if (excelData == undefined) {
     setTimeout(function () {
@@ -33,9 +41,9 @@ function changeTabs(e) {
   else {
     const { target } = e;
     let awardsTitle = target.textContent;
-    let winnerFilter = { "Quarter": "Q1", "Status (Approved/Winner)": "Winner", "Award Title-": awardsTitle };
+    let winnerFilter = { "Year": year, "Quarter": quarter, "Status (Approved/Winner)": "Winner", "Award Title-": awardsTitle };
     let quarterWinnerData = getFilteredData(excelData, winnerFilter);
-    let nomineeFilter = { "Quarter": "Q1", "Status (Approved/Winner)": "Nominated", "Award Title-": awardsTitle };
+    let nomineeFilter = { "Year": year, "Quarter": quarter, "Status (Approved/Winner)": "Nominated", "Award Title-": awardsTitle };
     let quarterNomineeData = getFilteredData(excelData, nomineeFilter);
     const parent = target.parentNode;
     const grandparent = parent.parentNode.nextElementSibling;
@@ -76,6 +84,14 @@ function configTabs(config, rootElem) {
 }
 
 function initTabs(elm, config, rootElem) {
+  const quarterTabs = document.querySelectorAll('.quarter-tabs > .tabList [role="tab"]');
+  if (quarterTabs.length) {
+    quarter = quarterTabs[0].textContent;
+  }
+  quarterTabs.forEach((quarterTab) => {
+    quarterTab.removeEventListener('click', changeQuarterTabs, false);
+    quarterTab.addEventListener('click', changeQuarterTabs);
+  });
   const tabs = elm.querySelectorAll('[role="tab"]');
   const tabLists = elm.querySelectorAll('[role="tablist"]');
   tabLists.forEach((tabList) => {
@@ -240,7 +256,9 @@ function createResultDiv(quarterWinnerData, quarterNomineeData) {
     content = "<div class=\"award-result\">" +
       "<h2 class=\"award-result-heading\">" + winnerData["Award Title-"] + "</h2>" +
       "<section class=\"award-result-winner\">" +
-      "    <img class=\"award-result-winner-photo\" src=\"" + winnerData["Image"] + "\" alt=\"Trulli\" width=\"400\" height=\"300\">" +
+      " <object class=\"award-result-winner-photo\" data=\"/profile/" + winnerData["Employee ldap"] + ".png\" type=\"image/png\">" +
+      "   <img class=\"award-result-winner-photo\" src=\"/profile/default.png\" alt=\"" + winnerData["Employee ldap"] + "\" width=\"400\" height=\"300\">" +
+      " </object>" +
       "    <section class=\"award-result-winner-details\">" +
       "        <span class=\"position\">" + winnerData["Position"] + ", " + winnerData["ACS Function"] + "</span>" +
       "        <span class=\"name\">" + winnerData["Name of Employee/Team (As per workday)"] + "</span>" +
@@ -255,7 +273,9 @@ function createResultDiv(quarterWinnerData, quarterNomineeData) {
 
 function createNomineeDiv(nomineeData) {
   let content = "<section class=\"award-result-nominee\">" +
-    "        <img class=\"award-result-nominee-photo\" src=\"" + nomineeData["Image"] + "\" alt=\"Trulli\" width=\"74\" height=\"72\">" +
+    " <object class=\"award-result-nominee-photo\" data=\"/profile/" + nomineeData["Employee ldap"] + ".png\" type=\"image/png\">" +
+    "   <img class=\"award-result-nominee-photo\" src=\"/profile/default.png\" alt=\"" + nomineeData["Employee ldap"] + "\" width=\"74\" height=\"72\">" +
+    " </object>" +
     "        <section class=\"award-result-nominee-details\">" +
     "            <span class=\"position\">" + nomineeData["Position"] + ", " + nomineeData["ACS Function"] + "</span>" +
     "            <span class=\"name\">" + nomineeData["Name of Employee/Team (As per workday)"] + "</span>" +
