@@ -102,9 +102,13 @@ main .form .button {
     padding: 6px 16px;
     border: none;
     font-family: adobe-clean, 'Trebuchet MS', sans-serif;
+    width: 100px;
 }
-
-main .form .form-submit-wrapper {
+.button.button-secondary {
+    background: rgb(214, 214, 215) !important;
+    color: black !important;
+}
+main .form .form-submit-wrapper, .form-clear-wrapper {
     display: flex;
     justify-content: flex-end;
 }

@@ -80,6 +80,7 @@ function createInput(fd) {
     input.type = fd.Type;
     input.id = fd.Field;
     input.setAttribute('placeholder', fd.Placeholder);
+    input.setAttribute('class', fd.Style);
     if (fd.Mandatory === 'x') {
         input.setAttribute('required', 'required');
     }
