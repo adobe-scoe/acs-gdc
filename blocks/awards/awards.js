@@ -6,8 +6,10 @@
 import { getLibs } from '../../scripts/utils.js';
 
 const { createTag } = await import(`${getLibs()}/utils/utils.js`);
-var excelData;
-var quarter;
+let excelData;
+let quarter;
+let otherNomineesLabel = "Other Nominees";
+let teamMemberLabel = "Members";
 const d = new Date();
 const year = d.getFullYear().toString();
 const isElementInContainerView = (targetEl) => {
@@ -85,13 +87,13 @@ function configTabs(config, rootElem) {
 
 function initTabs(elm, config, rootElem) {
   const quarterTabs = document.querySelectorAll('.quarter-tabs > .tabList [role="tab"]');
-  if (quarterTabs.length) {
+  if (quarterTabs?.length) {
     quarter = quarterTabs[0].textContent;
+    quarterTabs.forEach((quarterTab) => {
+      quarterTab.removeEventListener('click', changeQuarterTabs, false);
+      quarterTab.addEventListener('click', changeQuarterTabs);
+    });
   }
-  quarterTabs.forEach((quarterTab) => {
-    quarterTab.removeEventListener('click', changeQuarterTabs, false);
-    quarterTab.addEventListener('click', changeQuarterTabs);
-  });
   const tabs = elm.querySelectorAll('[role="tab"]');
   const tabLists = elm.querySelectorAll('[role="tablist"]');
   tabLists.forEach((tabList) => {
@@ -205,6 +207,12 @@ const init = (block) => {
       if (key == 'path') {
         fetchData(row.children[1].textContent);
       }
+      if (key == 'other-nominees-label') {
+        otherNomineesLabel = row.children[1].textContent;
+      }
+      if (key == 'team-member-label') {
+        teamMemberLabel = row.children[1].textContent;
+      }
       if (key !== 'tab') return;
       let val = getStringKeyName(row.children[1].textContent);
       if (!val) return;
@@ -234,22 +242,30 @@ async function fetchData(path) {
 
 function getFilteredData(data, filterName) {
   for (let [key, value] of Object.entries(filterName)) {
-    data = data.filter(function (entry) {
-      return entry[key] === value;
-    });
+    if (value != undefined) {
+      data = data.filter(function (entry) {
+        return entry[key].toLowerCase() === value.toLowerCase();
+      });
+    }
   }
   return data;
 }
 
 function createResultDiv(quarterWinnerData, quarterNomineeData) {
   let content = "";
-  if (quarterWinnerData.length) {
+  if (quarterWinnerData?.length) {
     let winnerData = quarterWinnerData ? quarterWinnerData[0] : {};
     let nomineeContent = "";
     for (let nomineeData of quarterNomineeData) {
       nomineeContent += createNomineeDiv(nomineeData);
     }
-    let nomineeSection = quarterNomineeData.length ? "<h4 class=\"award-result-sub-heading\">Other Nominees</h4>" +
+    let teamMemberContent = "";
+    if (winnerData["teamMembers"]?.length) {
+      let teamMembers = winnerData["teamMembers"].trim().split(",");
+      let trimedTeamMembers = teamMembers.map(str => str.trim());
+      teamMemberContent = "<span class=\"team-members\">" + teamMemberLabel + ": " + trimedTeamMembers.join(" | ") + "</span>";
+    }
+    let nomineeSection = quarterNomineeData?.length ? "<h4 class=\"award-result-sub-heading\">" + otherNomineesLabel + "</h4>" +
       "<section class=\"award-result-nominees\">" +
       nomineeContent +
       "</section>" : "";
@@ -263,6 +279,7 @@ function createResultDiv(quarterWinnerData, quarterNomineeData) {
       "        <span class=\"position\">" + winnerData["Position"] + ", " + winnerData["ACS Function"] + "</span>" +
       "        <span class=\"name\">" + winnerData["Name of Employee/Team (As per workday)"] + "</span>" +
       "        <span class=\"description\">" + winnerData["Citation to be mentioned on slide (max 100 words)"] + "</span>" +
+      teamMemberContent +
       "    </section>" +
       "</section>" +
       nomineeSection +
