@@ -1,3 +1,5 @@
+const FUNCTIONAL = 'Functional';
+
 function createSelect(fd) {
     const select = document.createElement('select');
     select.id = fd.Field;
@@ -139,8 +141,9 @@ function hideShowFormFields(e) {
         awards.removeChild(awards.options[i]);
     }
     let value = selectedValue;
-    if (selectedValue.startsWith("Function")) {
-         value = selectedValue.substr("Function".length - 1,selectedValue.length);
+    if (selectedValue.startsWith(FUNCTIONAL)) {
+        //value = selectedValue.substr("Functional".length + 1,selectedValue.length);
+        value = FUNCTIONAL;
     }
  
     let entry = getFilteredAwardCategories(records.data,value);
