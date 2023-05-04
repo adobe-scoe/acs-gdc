@@ -8,7 +8,6 @@ import { getLibs } from '../../scripts/utils.js';
 const { createTag } = await import(`${getLibs()}/utils/utils.js`);
 let excelData;
 let quarter;
-let quarterabcd;
 let otherNomineesLabel = "Other Nominees";
 let teamMemberLabel = "Members";
 const winnerStr = "Winner";
