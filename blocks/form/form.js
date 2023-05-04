@@ -1,4 +1,7 @@
 const FUNCTIONAL = 'Functional';
+const BEGIN_DATE = new Date('1900-01-01');// Set start date as January 1st, 1900
+const MILISECONDS_PER_DAY = 24 * 60 * 60 * 1000; // Number of milliseconds in a day
+const CURRENT_DATE = new Date(); // Get current date
 
 function createSelect(fd) {
     const select = document.createElement('select');
@@ -55,6 +58,7 @@ function createButton(fd, nominationOpen) {
     button.textContent = fd.Label;
     button.classList.add('button');
     if (fd.Type === 'submit') {
+        button.setAttribute('name', 'btnSubmit');
         button.addEventListener('click', async (event) => {
             const form = button.closest('form');
             if (form.checkValidity() ) {
@@ -131,28 +135,26 @@ function hideShowFormFields(e) {
         return;
     }
     if (e.target.id == "category") {
-    console.log("hide show form field function");
+        var selectedValue = e.target.value;
+        var awards = document.getElementById("award");
+
+        for (var i=awards.options.length; i--;) {
+            awards.removeChild(awards.options[i]);
+        }
+        let value = selectedValue;
+        if (selectedValue.startsWith(FUNCTIONAL)) {
+            //value = selectedValue.substr("Functional".length + 1,selectedValue.length);
+            value = FUNCTIONAL;
+        }
     
-    var selectedValue = e.target.value;
-
-    var awards = document.getElementById("award");
-
-    for (var i=awards.options.length; i--;) {
-        awards.removeChild(awards.options[i]);
-    }
-    let value = selectedValue;
-    if (selectedValue.startsWith(FUNCTIONAL)) {
-        //value = selectedValue.substr("Functional".length + 1,selectedValue.length);
-        value = FUNCTIONAL;
-    }
- 
-    let entry = getFilteredAwardCategories(records.data,value);
+        let entry = getFilteredAwardCategories(records.data, value);
         entry.options.split(',').forEach((o) => {
             const option = document.createElement('option');
             option.textContent = o.trim();
             option.value = o.trim();
             awards.append(option);
         });
+        showHideSubmitButton(entry);
     } else  if (e.target.id == "award"){
         if (e.target.value == "Team Awards") {
             document.getElementsByClassName('form-empLdap-wrapper')[0].setAttribute('hidden','');
@@ -162,27 +164,40 @@ function hideShowFormFields(e) {
             document.getElementsByClassName('form-empLdap-wrapper')[0].removeAttribute('hidden');
             document.getElementsByClassName('form-empId-wrapper')[0].removeAttribute('hidden');
             document.getElementsByClassName('form-teamMembers-wrapper')[0].setAttribute('hidden','');
-        } 
-        
+        }
     }
 }
 
-function getFilteredAwardCategories(records,key) {
+function getFilteredAwardCategories(records, key) {
     let object = {};
     records.filter(function(e){
         if (e.category==key) {
             object = e;
-            console.log(e)
+            console.debug(e)
         }
     });
     return object;
 }
 
+function showHideSubmitButton(configEntry) {
+    const endDate = new Date(BEGIN_DATE.getTime() + (configEntry.endDate * MILISECONDS_PER_DAY)); // Calculate end date by adding milliseconds
+    const startDate = new Date(BEGIN_DATE.getTime() + (configEntry.startDate * MILISECONDS_PER_DAY)); // Calculate end date by adding milliseconds
+    let btnSubmit = document.getElementsByName('btnSubmit')[0];
+    if (startDate <= CURRENT_DATE && endDate < CURRENT_DATE){
+        btnSubmit.setAttribute('disabled','');
+        btnSubmit.classList.remove('button');
+        btnSubmit.classList.add('disabledButton')
+    } else {
+        btnSubmit.removeAttribute('disabled');
+        btnSubmit.classList.remove('disabledButton');
+        btnSubmit.classList.contains('button') ? '' : btnSubmit.classList.add('button');
+    }
+}
+
 let records = {}
 async function createForm(formURL) {
     console.debug('inside create form path :' , formURL)
-    const beginDate = new Date('1900-01-01');// Set start date as January 1st, 1900
-    const millisecondsPerDay = 24 * 60 * 60 * 1000; // Number of milliseconds in a day
+    
     var nominationOpen = false;
     const { pathname } = new URL(formURL);
     const checkValidityFormURL  = formURL+"?sheet=config";
@@ -193,14 +208,12 @@ async function createForm(formURL) {
     const validityresp = await fetch(checkValidityFormURL,{cache: 'no-cache', mode: 'cors'});
     records = await validityresp.json();
     console.debug(records);
-    const endDate = new Date(beginDate.getTime() + (records.data[0].endDate * millisecondsPerDay)); // Calculate end date by adding milliseconds
-    const startDate = new Date(beginDate.getTime() + (records.data[0].startDate * millisecondsPerDay)); // Calculate end date by adding milliseconds
+    const endDate = new Date(BEGIN_DATE.getTime() + (records.data[0].endDate * MILISECONDS_PER_DAY)); // Calculate end date by adding milliseconds
+    const startDate = new Date(BEGIN_DATE.getTime() + (records.data[0].startDate * MILISECONDS_PER_DAY)); // Calculate end date by adding milliseconds
     console.debug('startDate -',startDate);
     console.debug('endDate -',endDate);
-
-    const currentDate = new Date(); // Get current date
-    console.debug('currentdate - ', currentDate)
-    if (currentDate >= startDate && currentDate <endDate){
+    console.debug('CURRENT_DATE - ', CURRENT_DATE)
+    if (CURRENT_DATE >= startDate && CURRENT_DATE <endDate){
         //TODO set a flag 
         console.debug('current date in range , nomination open')
         nominationOpen = true;
