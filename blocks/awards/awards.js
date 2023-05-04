@@ -15,17 +15,20 @@ const nominatedStr = "Nominated";
 const pathStr = 'path';
 const otherNomineesStr = 'other-nominees-label';
 const teamMemberStr = 'team-member-label';
+const pngStr = ".png";
 
-const yearStr = "Year";
-const quarterStr = "Quarter";
-const statusStr = "Status (Approved/Winner)";
-const awardTitleStr = "Award Title-";
+const yearStr = "year";
+const quarterStr = "quarter";
+const statusStr = "status";
+const awardTitleStr = "award";
 const teamMembersStr = "teamMembers";
-const ldapStr = "Employee ldap";
-const positionStr = "Position";
-const acsFunctionStr = "ACS Function";
-const nameStr = "Name of Employee/Team (As per workday)";
-const descriptionStr = "Citation to be mentioned on slide (max 100 words)";
+const ldapStr = "empLdap";
+const positionStr = "position";
+const managerNameStr = "managerName";
+const imageStr = "image";
+const acsFunctionStr = "function";
+const nameStr = "empName";
+const descriptionStr = "citation";
 
 const d = new Date();
 const year = d.getFullYear().toString();
@@ -267,7 +270,6 @@ async function fetchData(path) {
   const response = await fetch(path);
   const jsonData = await response.json();
   excelData = jsonData.data;
-  excelData.shift();
 }
 
 function getFilteredData(data, filterName) {
@@ -288,10 +290,17 @@ function createResultDiv(quarterWinnerData, quarterNomineeData) {
       nomineeContent += createNomineeDiv(nomineeData);
     }
     let teamMemberContent = "";
+    let postionText = winnerData[positionStr];
+    
     if (winnerData[teamMembersStr]?.length) {
+      postionText = winnerData[managerNameStr];
       let teamMembers = winnerData[teamMembersStr].trim().split(",");
       let trimedTeamMembers = teamMembers.map(str => str.trim());
       teamMemberContent = "<span class=\"team-members\">" + teamMemberLabel + ": " + trimedTeamMembers.join(" | ") + "</span>";
+    }
+    let imageSrc = winnerData[ldapStr] + pngStr;
+    if (winnerData[imageStr]) {
+      imageSrc = winnerData[imageStr];
     }
     let nomineeSection = quarterNomineeData?.length ? "<h4 class=\"award-result-sub-heading\">" + otherNomineesLabel + "</h4>" +
       "<section class=\"award-result-nominees\">" +
@@ -300,11 +309,11 @@ function createResultDiv(quarterWinnerData, quarterNomineeData) {
     content = "<div class=\"award-result\">" +
       "<h2 class=\"award-result-heading\">" + winnerData[awardTitleStr] + "</h2>" +
       "<section class=\"award-result-winner\">" +
-      " <object class=\"award-result-winner-photo\" data=\"/profile/" + winnerData[ldapStr] + ".png\" type=\"image/png\">" +
+      " <object class=\"award-result-winner-photo\" data=\"/profile/" + imageSrc + "\" type=\"image/png\">" +
       "   <img class=\"award-result-winner-photo\" src=\"/profile/default.png\" alt=\"" + winnerData[ldapStr] + "\" width=\"400\" height=\"300\">" +
       " </object>" +
       "    <section class=\"award-result-winner-details\">" +
-      "        <span class=\"position\">" + winnerData[positionStr] + ", " + winnerData[acsFunctionStr] + "</span>" +
+      "        <span class=\"position\">" + postionText + ", " + winnerData[acsFunctionStr] + "</span>" +
       "        <span class=\"name\">" + winnerData[nameStr] + "</span>" +
       "        <span class=\"description\">" + winnerData[descriptionStr] + "</span>" +
       teamMemberContent +
@@ -317,12 +326,20 @@ function createResultDiv(quarterWinnerData, quarterNomineeData) {
 }
 
 function createNomineeDiv(nomineeData) {
+  let postionText = nomineeData[positionStr];
+  if (nomineeData[teamMembersStr]?.length) {
+    postionText = nomineeData[managerNameStr]
+  }
+  let imageSrc = nomineeData[ldapStr] + pngStr;
+  if (nomineeData[imageStr]) {
+    imageSrc = nomineeData[imageStr];
+  }
   let content = "<section class=\"award-result-nominee\">" +
-    " <object class=\"award-result-nominee-photo\" data=\"/profile/" + nomineeData[ldapStr] + ".png\" type=\"image/png\">" +
+    " <object class=\"award-result-nominee-photo\" data=\"/profile/" + imageSrc + "\" type=\"image/png\">" +
     "   <img class=\"award-result-nominee-photo\" src=\"/profile/default.png\" alt=\"" + nomineeData[ldapStr] + "\" width=\"74\" height=\"72\">" +
     " </object>" +
     "        <section class=\"award-result-nominee-details\">" +
-    "            <span class=\"position\">" + nomineeData[positionStr] + ", " + nomineeData[acsFunctionStr] + "</span>" +
+    "            <span class=\"position\">" + postionText + ", " + nomineeData[acsFunctionStr] + "</span>" +
     "            <span class=\"name\">" + nomineeData[nameStr] + "</span>" +
     "        </section>" +
     "    </section>";
