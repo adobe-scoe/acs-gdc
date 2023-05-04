@@ -8,8 +8,26 @@ import { getLibs } from '../../scripts/utils.js';
 const { createTag } = await import(`${getLibs()}/utils/utils.js`);
 let excelData;
 let quarter;
+let quarterabcd;
 let otherNomineesLabel = "Other Nominees";
 let teamMemberLabel = "Members";
+const winnerStr = "Winner";
+const nominatedStr = "Nominated";
+const pathStr = 'path';
+const otherNomineesStr = 'other-nominees-label';
+const teamMemberStr = 'team-member-label';
+
+const yearStr = "Year";
+const quarterStr = "Quarter";
+const statusStr = "Status (Approved/Winner)";
+const awardTitleStr = "Award Title-";
+const teamMembersStr = "teamMembers";
+const ldapStr = "Employee ldap";
+const positionStr = "Position";
+const acsFunctionStr = "ACS Function";
+const nameStr = "Name of Employee/Team (As per workday)";
+const descriptionStr = "Citation to be mentioned on slide (max 100 words)";
+
 const d = new Date();
 const year = d.getFullYear().toString();
 const isElementInContainerView = (targetEl) => {
@@ -43,9 +61,22 @@ function changeTabs(e) {
   else {
     const { target } = e;
     let awardsTitle = target.textContent;
-    let winnerFilter = { "Year": year, "Quarter": quarter, "Status (Approved/Winner)": "Winner", "Award Title-": awardsTitle };
+    let winnerFilter = {};
+    winnerFilter[yearStr] = year;
+    if (quarter != undefined) {
+      winnerFilter[quarterStr] = quarter;
+    }
+    winnerFilter[statusStr] = winnerStr;
+    winnerFilter[awardTitleStr] = awardsTitle;
+
     let quarterWinnerData = getFilteredData(excelData, winnerFilter);
-    let nomineeFilter = { "Year": year, "Quarter": quarter, "Status (Approved/Winner)": "Nominated", "Award Title-": awardsTitle };
+    let nomineeFilter = {};
+    nomineeFilter[yearStr] = year;
+    if (quarter != undefined) {
+      nomineeFilter[quarterStr] = quarter;
+    }
+    nomineeFilter[statusStr] = nominatedStr;
+    nomineeFilter[awardTitleStr] = awardsTitle;
     let quarterNomineeData = getFilteredData(excelData, nomineeFilter);
     const parent = target.parentNode;
     const grandparent = parent.parentNode.nextElementSibling;
@@ -204,13 +235,13 @@ const init = (block) => {
     const rows = sectionMetadata.querySelectorAll(':scope > div');
     rows.forEach((row) => {
       const key = getStringKeyName(row.children[0].textContent);
-      if (key == 'path') {
+      if (key == pathStr) {
         fetchData(row.children[1].textContent);
       }
-      if (key == 'other-nominees-label') {
+      if (key == otherNomineesStr) {
         otherNomineesLabel = row.children[1].textContent;
       }
-      if (key == 'team-member-label') {
+      if (key == teamMemberStr) {
         teamMemberLabel = row.children[1].textContent;
       }
       if (key !== 'tab') return;
@@ -242,11 +273,9 @@ async function fetchData(path) {
 
 function getFilteredData(data, filterName) {
   for (let [key, value] of Object.entries(filterName)) {
-    if (value != undefined) {
-      data = data.filter(function (entry) {
-        return entry[key].toLowerCase() === value.toLowerCase();
-      });
-    }
+    data = data.filter(function (entry) {
+      return entry[key].toLowerCase() === value.toLowerCase();
+    });
   }
   return data;
 }
@@ -260,8 +289,8 @@ function createResultDiv(quarterWinnerData, quarterNomineeData) {
       nomineeContent += createNomineeDiv(nomineeData);
     }
     let teamMemberContent = "";
-    if (winnerData["teamMembers"]?.length) {
-      let teamMembers = winnerData["teamMembers"].trim().split(",");
+    if (winnerData[teamMembersStr]?.length) {
+      let teamMembers = winnerData[teamMembersStr].trim().split(",");
       let trimedTeamMembers = teamMembers.map(str => str.trim());
       teamMemberContent = "<span class=\"team-members\">" + teamMemberLabel + ": " + trimedTeamMembers.join(" | ") + "</span>";
     }
@@ -270,15 +299,15 @@ function createResultDiv(quarterWinnerData, quarterNomineeData) {
       nomineeContent +
       "</section>" : "";
     content = "<div class=\"award-result\">" +
-      "<h2 class=\"award-result-heading\">" + winnerData["Award Title-"] + "</h2>" +
+      "<h2 class=\"award-result-heading\">" + winnerData[awardTitleStr] + "</h2>" +
       "<section class=\"award-result-winner\">" +
-      " <object class=\"award-result-winner-photo\" data=\"/profile/" + winnerData["Employee ldap"] + ".png\" type=\"image/png\">" +
-      "   <img class=\"award-result-winner-photo\" src=\"/profile/default.png\" alt=\"" + winnerData["Employee ldap"] + "\" width=\"400\" height=\"300\">" +
+      " <object class=\"award-result-winner-photo\" data=\"/profile/" + winnerData[ldapStr] + ".png\" type=\"image/png\">" +
+      "   <img class=\"award-result-winner-photo\" src=\"/profile/default.png\" alt=\"" + winnerData[ldapStr] + "\" width=\"400\" height=\"300\">" +
       " </object>" +
       "    <section class=\"award-result-winner-details\">" +
-      "        <span class=\"position\">" + winnerData["Position"] + ", " + winnerData["ACS Function"] + "</span>" +
-      "        <span class=\"name\">" + winnerData["Name of Employee/Team (As per workday)"] + "</span>" +
-      "        <span class=\"description\">" + winnerData["Citation to be mentioned on slide (max 100 words)"] + "</span>" +
+      "        <span class=\"position\">" + winnerData[positionStr] + ", " + winnerData[acsFunctionStr] + "</span>" +
+      "        <span class=\"name\">" + winnerData[nameStr] + "</span>" +
+      "        <span class=\"description\">" + winnerData[descriptionStr] + "</span>" +
       teamMemberContent +
       "    </section>" +
       "</section>" +
@@ -290,12 +319,12 @@ function createResultDiv(quarterWinnerData, quarterNomineeData) {
 
 function createNomineeDiv(nomineeData) {
   let content = "<section class=\"award-result-nominee\">" +
-    " <object class=\"award-result-nominee-photo\" data=\"/profile/" + nomineeData["Employee ldap"] + ".png\" type=\"image/png\">" +
-    "   <img class=\"award-result-nominee-photo\" src=\"/profile/default.png\" alt=\"" + nomineeData["Employee ldap"] + "\" width=\"74\" height=\"72\">" +
+    " <object class=\"award-result-nominee-photo\" data=\"/profile/" + nomineeData[ldapStr] + ".png\" type=\"image/png\">" +
+    "   <img class=\"award-result-nominee-photo\" src=\"/profile/default.png\" alt=\"" + nomineeData[ldapStr] + "\" width=\"74\" height=\"72\">" +
     " </object>" +
     "        <section class=\"award-result-nominee-details\">" +
-    "            <span class=\"position\">" + nomineeData["Position"] + ", " + nomineeData["ACS Function"] + "</span>" +
-    "            <span class=\"name\">" + nomineeData["Name of Employee/Team (As per workday)"] + "</span>" +
+    "            <span class=\"position\">" + nomineeData[positionStr] + ", " + nomineeData[acsFunctionStr] + "</span>" +
+    "            <span class=\"name\">" + nomineeData[nameStr] + "</span>" +
     "        </section>" +
     "    </section>";
   return content;
