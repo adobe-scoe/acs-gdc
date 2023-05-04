@@ -1,6 +1,7 @@
 function createSelect(fd) {
     const select = document.createElement('select');
     select.id = fd.Field;
+    select.addEventListener('change', hideShowFormFields);
     if (fd.Placeholder) {
         const ph = document.createElement('option');
         ph.textContent = fd.Placeholder;
@@ -123,6 +124,58 @@ function applyRules(form, rules) {
     });
 }
 
+function hideShowFormFields(e) {
+    if (e.target.id != "category" && e.target.id != "award" ) {
+        return;
+    }
+    if (e.target.id == "category") {
+    console.log("hide show form field function");
+    
+    var selectedValue = e.target.value;
+
+    var awards = document.getElementById("award");
+
+    for (var i=awards.options.length; i--;) {
+        awards.removeChild(awards.options[i]);
+    }
+    let value = selectedValue;
+    if (selectedValue.startsWith("Function")) {
+         value = selectedValue.substr("Function".length - 1,selectedValue.length);
+    }
+ 
+    let entry = getFilteredAwardCategories(records.data,value);
+        entry.options.split(',').forEach((o) => {
+            const option = document.createElement('option');
+            option.textContent = o.trim();
+            option.value = o.trim();
+            awards.append(option);
+        });
+    } else  if (e.target.id == "award"){
+        if (e.target.value == "Team Awards") {
+            document.getElementsByClassName('form-empLdap-wrapper')[0].setAttribute('hidden','');
+            document.getElementsByClassName('form-empId-wrapper')[0].setAttribute('hidden','');
+            document.getElementsByClassName('form-teamMembers-wrapper')[0].removeAttribute('hidden');
+        } else {
+            document.getElementsByClassName('form-empLdap-wrapper')[0].removeAttribute('hidden');
+            document.getElementsByClassName('form-empId-wrapper')[0].removeAttribute('hidden');
+            document.getElementsByClassName('form-teamMembers-wrapper')[0].setAttribute('hidden','');
+        } 
+        
+    }
+}
+
+function getFilteredAwardCategories(records,key) {
+    let object = {};
+    records.filter(function(e){
+        if (e.category==key) {
+            object = e;
+            console.log(e)
+        }
+    });
+    return object;
+}
+
+let records = {}
 async function createForm(formURL) {
     console.debug('inside create form path :' , formURL)
     const beginDate = new Date('1900-01-01');// Set start date as January 1st, 1900
@@ -135,10 +188,10 @@ async function createForm(formURL) {
    // const validityjson = await validityResp.json();
     console.debug(checkValidityFormURL);
     const validityresp = await fetch(checkValidityFormURL,{cache: 'no-cache', mode: 'cors'});
-    const datejson = await validityresp.json();
-    console.debug(datejson);
-    const endDate = new Date(beginDate.getTime() + (datejson.data[0].endDate * millisecondsPerDay)); // Calculate end date by adding milliseconds
-    const startDate = new Date(beginDate.getTime() + (datejson.data[0].startDate * millisecondsPerDay)); // Calculate end date by adding milliseconds
+    records = await validityresp.json();
+    console.debug(records);
+    const endDate = new Date(beginDate.getTime() + (records.data[0].endDate * millisecondsPerDay)); // Calculate end date by adding milliseconds
+    const startDate = new Date(beginDate.getTime() + (records.data[0].startDate * millisecondsPerDay)); // Calculate end date by adding milliseconds
     console.debug('startDate -',startDate);
     console.debug('endDate -',endDate);
 
@@ -206,7 +259,7 @@ async function createForm(formURL) {
 
     form.addEventListener('change', () => applyRules(form, rules));
     applyRules(form, rules);
-
+    //hideShowFormFields(document.getElementById('teamMembers'));
     return (form);
 }
 
