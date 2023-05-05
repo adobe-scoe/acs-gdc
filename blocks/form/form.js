@@ -145,8 +145,10 @@ function hideShowFormFields(e) {
         if (selectedValue.startsWith(FUNCTIONAL)) {
             //value = selectedValue.substr("Functional".length + 1,selectedValue.length);
             value = FUNCTIONAL;
-        }
-
+            document.getElementsByClassName('form-teamMembers-wrapper')[0].setAttribute('hidden', '');
+        } else if (selectedValue.startsWith("Rockstars")) {
+            document.getElementsByClassName('form-teamMembers-wrapper')[0].setAttribute('hidden', '');
+        } 
         let entry = getFilteredAwardCategories(records.data, value);
         entry.options.split(',').forEach((o) => {
             const option = document.createElement('option');
