@@ -122,5 +122,7 @@ main .form .disabledButton {
 }
 main .form .form-submit-wrapper, .form-clear-wrapper {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-evenly;
+    width: 50%;
+    margin: auto;
 }

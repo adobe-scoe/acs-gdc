@@ -230,6 +230,7 @@ async function createForm(formURL) {
     console.debug(json)
     // eslint-disable-next-line prefer-destructuring
     form.dataset.action = pathname.split('.json')[0];
+    let submitWrapper;
     json.data.forEach((fd) => {
         fd.Type = fd.Type || 'text';
         const fieldWrapper = document.createElement('div');
@@ -256,6 +257,10 @@ async function createForm(formURL) {
                 break;
             case 'submit':
                 fieldWrapper.append(createButton(fd, nominationOpen));
+                submitWrapper = fieldWrapper;
+                break;
+            case 'reset':
+                submitWrapper.append(createInput(fd));
                 break;
             default:
                 fieldWrapper.append(createLabel(fd));
