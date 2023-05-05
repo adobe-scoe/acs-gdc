@@ -53,7 +53,7 @@ async function submitForm(form) {
 }
 
 function createButton(fd, nominationOpen) {
-    console.debug('nomination open -  ',nominationOpen)
+    console.debug('nomination open -  ', nominationOpen)
     const button = document.createElement('button');
     button.textContent = fd.Label;
     button.classList.add('button');
@@ -61,7 +61,7 @@ function createButton(fd, nominationOpen) {
         button.setAttribute('name', 'btnSubmit');
         button.addEventListener('click', async (event) => {
             const form = button.closest('form');
-            if (form.checkValidity() ) {
+            if (form.checkValidity()) {
                 event.preventDefault();
                 button.setAttribute('disabled', '');
                 await submitForm(form);
@@ -69,7 +69,7 @@ function createButton(fd, nominationOpen) {
                 window.location.href = redirectTo;
             }
         });
-        if(!nominationOpen){
+        if (!nominationOpen) {
             button.setAttribute('disabled', '');
         }
     }
@@ -131,22 +131,24 @@ function applyRules(form, rules) {
 }
 
 function hideShowFormFields(e) {
-    if (e.target.id != "category" && e.target.id != "award" ) {
+    if (e.target.id != "category" && e.target.id != "award") {
         return;
     }
     if (e.target.id == "category") {
         var selectedValue = e.target.value;
         var awards = document.getElementById("award");
 
-        for (var i=awards.options.length; i--;) {
+        for (var i = awards.options.length; i--;) {
             awards.removeChild(awards.options[i]);
         }
         let value = selectedValue;
         if (selectedValue.startsWith(FUNCTIONAL)) {
             //value = selectedValue.substr("Functional".length + 1,selectedValue.length);
             value = FUNCTIONAL;
-        }
-    
+            document.getElementsByClassName('form-teamMembers-wrapper')[0].setAttribute('hidden', '');
+        } else if (selectedValue.startsWith("Rockstars")) {
+            document.getElementsByClassName('form-teamMembers-wrapper')[0].setAttribute('hidden', '');
+        } 
         let entry = getFilteredAwardCategories(records.data, value);
         entry.options.split(',').forEach((o) => {
             const option = document.createElement('option');
@@ -155,23 +157,25 @@ function hideShowFormFields(e) {
             awards.append(option);
         });
         showHideSubmitButton(entry);
-    } else  if (e.target.id == "award"){
+    } else if (e.target.id == "award") {
         if (e.target.value == "Team Awards") {
-            document.getElementsByClassName('form-empLdap-wrapper')[0].setAttribute('hidden','');
-            document.getElementsByClassName('form-empId-wrapper')[0].setAttribute('hidden','');
+            document.getElementsByClassName('form-empLdap-wrapper')[0].setAttribute('hidden', '');
+            document.getElementsByClassName('form-empId-wrapper')[0].setAttribute('hidden', '');
+            document.getElementsByClassName('form-empTitle-wrapper')[0].setAttribute('hidden', '');
             document.getElementsByClassName('form-teamMembers-wrapper')[0].removeAttribute('hidden');
         } else {
             document.getElementsByClassName('form-empLdap-wrapper')[0].removeAttribute('hidden');
             document.getElementsByClassName('form-empId-wrapper')[0].removeAttribute('hidden');
-            document.getElementsByClassName('form-teamMembers-wrapper')[0].setAttribute('hidden','');
+            document.getElementsByClassName('form-empTitle-wrapper')[0].removeAttribute('hidden');
+            document.getElementsByClassName('form-teamMembers-wrapper')[0].setAttribute('hidden', '');
         }
     }
 }
 
 function getFilteredAwardCategories(records, key) {
     let object = {};
-    records.filter(function(e){
-        if (e.category==key) {
+    records.filter(function (e) {
+        if (e.category == key) {
             object = e;
             console.debug(e)
         }
@@ -183,8 +187,8 @@ function showHideSubmitButton(configEntry) {
     const endDate = new Date(BEGIN_DATE.getTime() + (configEntry.endDate * MILISECONDS_PER_DAY)); // Calculate end date by adding milliseconds
     const startDate = new Date(BEGIN_DATE.getTime() + (configEntry.startDate * MILISECONDS_PER_DAY)); // Calculate end date by adding milliseconds
     let btnSubmit = document.getElementsByName('btnSubmit')[0];
-    if (startDate <= CURRENT_DATE && endDate < CURRENT_DATE){
-        btnSubmit.setAttribute('disabled','');
+    if (startDate <= CURRENT_DATE && endDate < CURRENT_DATE) {
+        btnSubmit.setAttribute('disabled', '');
         btnSubmit.classList.remove('button');
         btnSubmit.classList.add('disabledButton')
     } else {
@@ -194,30 +198,49 @@ function showHideSubmitButton(configEntry) {
     }
 }
 
+function showNominationStatus(records) {
+    var formInfoDom = document.createElement('div');
+    records.data.forEach((record) => {
+        let nominationEndDate = new Date(BEGIN_DATE.getTime() + (record.endDate * MILISECONDS_PER_DAY));
+        let nominationStartDate = new Date(BEGIN_DATE.getTime() + (record.startDate * MILISECONDS_PER_DAY));
+        console.log("start "+nominationStartDate+ " end date "+nominationEndDate);
+        if (CURRENT_DATE >= nominationStartDate && CURRENT_DATE < nominationEndDate) {
+            var nominationInfo = document.createElement('p');
+            nominationInfo.textContent= 'Nomination is open' + ' for '+record.category +' till ' + nominationEndDate.toDateString();
+            nominationInfo.style.color = 'green';
+        } else {
+            var nominationInfo = document.createElement('p');
+            nominationInfo.textContent= 'Nomination has been closed' + ' for '+record.category + ' on ' + nominationEndDate.toDateString();
+            nominationInfo.style.color = 'red';
+        }
+        formInfoDom.append(nominationInfo);
+    })  
+    return formInfoDom;  
+}
 let records = {}
 async function createForm(formURL) {
-    console.debug('inside create form path :' , formURL)
-    
+    console.debug('inside create form path :', formURL)
+
     var nominationOpen = false;
     const { pathname } = new URL(formURL);
-    const checkValidityFormURL  = formURL+"?sheet=config";
-    const {configpath} = new URL(checkValidityFormURL);
+    const checkValidityFormURL = formURL + "?sheet=config";
+    const { configpath } = new URL(checkValidityFormURL);
     //const validityResp = await fetch(configpath);
-   // const validityjson = await validityResp.json();
+    // const validityjson = await validityResp.json();
     console.debug(checkValidityFormURL);
-    const validityresp = await fetch(checkValidityFormURL,{cache: 'no-cache', mode: 'cors'});
+    const validityresp = await fetch(checkValidityFormURL, { cache: 'no-cache', mode: 'cors' });
     records = await validityresp.json();
     console.debug(records);
     const endDate = new Date(BEGIN_DATE.getTime() + (records.data[0].endDate * MILISECONDS_PER_DAY)); // Calculate end date by adding milliseconds
     const startDate = new Date(BEGIN_DATE.getTime() + (records.data[0].startDate * MILISECONDS_PER_DAY)); // Calculate end date by adding milliseconds
-    console.debug('startDate -',startDate);
-    console.debug('endDate -',endDate);
+    console.debug('startDate -', startDate);
+    console.debug('endDate -', endDate);
     console.debug('CURRENT_DATE - ', CURRENT_DATE)
-    if (CURRENT_DATE >= startDate && CURRENT_DATE <endDate){
+    if (CURRENT_DATE >= startDate && CURRENT_DATE < endDate) {
         //TODO set a flag 
         console.debug('current date in range , nomination open')
         nominationOpen = true;
-    }else {
+    } else {
         //TODO unset a flag 
         console.debug('current date not range , nomination closed')
         nominationOpen = false;
@@ -226,10 +249,12 @@ async function createForm(formURL) {
     const resp = await fetch(pathname);
     const json = await resp.json();
     const form = document.createElement('form');
+    form.append(showNominationStatus(records));
     const rules = [];
     console.debug(json)
     // eslint-disable-next-line prefer-destructuring
     form.dataset.action = pathname.split('.json')[0];
+    let submitWrapper;
     json.data.forEach((fd) => {
         fd.Type = fd.Type || 'text';
         const fieldWrapper = document.createElement('div');
@@ -256,6 +281,10 @@ async function createForm(formURL) {
                 break;
             case 'submit':
                 fieldWrapper.append(createButton(fd, nominationOpen));
+                submitWrapper = fieldWrapper;
+                break;
+            case 'reset':
+                submitWrapper.append(createInput(fd));
                 break;
             default:
                 fieldWrapper.append(createLabel(fd));
