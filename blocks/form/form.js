@@ -194,6 +194,25 @@ function showHideSubmitButton(configEntry) {
     }
 }
 
+function showNominationStatus(records) {
+    var formInfoDom = document.createElement('div');
+    records.data.forEach((record) => {
+        let nominationEndDate = new Date(BEGIN_DATE.getTime() + (record.endDate * MILISECONDS_PER_DAY));
+        let nominationStartDate = new Date(BEGIN_DATE.getTime() + (record.startDate * MILISECONDS_PER_DAY));
+        console.log("start "+nominationStartDate+ " end date "+nominationEndDate);
+        if (CURRENT_DATE >= nominationStartDate && CURRENT_DATE < nominationEndDate) {
+            var nominationInfo = document.createElement('p');
+            nominationInfo.textContent= 'Nomination is open' + ' for '+record.category +' till ' + nominationEndDate.toDateString();
+            nominationInfo.style.color = 'green';
+        } else {
+            var nominationInfo = document.createElement('p');
+            nominationInfo.textContent= 'Nomination has been closed' + ' for '+record.category + ' on ' + nominationEndDate.toDateString();
+            nominationInfo.style.color = 'red';
+        }
+        formInfoDom.append(nominationInfo);
+    })  
+    return formInfoDom;  
+}
 let records = {}
 async function createForm(formURL) {
     console.debug('inside create form path :', formURL)
@@ -226,6 +245,7 @@ async function createForm(formURL) {
     const resp = await fetch(pathname);
     const json = await resp.json();
     const form = document.createElement('form');
+    form.append(showNominationStatus(records));
     const rules = [];
     console.debug(json)
     // eslint-disable-next-line prefer-destructuring
