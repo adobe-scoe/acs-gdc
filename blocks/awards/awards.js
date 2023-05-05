@@ -23,10 +23,10 @@ const statusStr = "status";
 const awardTitleStr = "award";
 const teamMembersStr = "teamMembers";
 const ldapStr = "empLdap";
-const positionStr = "position";
+const positionStr = "empTitle";
 const managerNameStr = "managerName";
 const imageStr = "image";
-const acsFunctionStr = "function";
+const acsFunctionStr = "category";
 const nameStr = "empName";
 const descriptionStr = "citation";
 
