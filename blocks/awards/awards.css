@@ -267,7 +267,7 @@
     margin-top: -28px;
     max-width: 70%;
     margin-bottom: 28px;
-    border : none;
+    border: none;
 
 }
 
@@ -295,6 +295,7 @@
 .award-result-winner {
     display: flex;
     flex-direction: row;
+    margin-bottom: 12px;
 }
 
 .award-result-winner-details {
@@ -345,6 +346,7 @@
     display: flex;
     margin-bottom: 24px;
 }
+
 .award-result-nominee:nth-child(odd) {
     width: 400px;
     margin-right: 24px;
