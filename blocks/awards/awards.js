@@ -8,6 +8,7 @@ import { getLibs } from '../../scripts/utils.js';
 const { createTag } = await import(`${getLibs()}/utils/utils.js`);
 let excelData;
 let quarter;
+let awardsTitle;
 let otherNomineesLabel = "Other Nominees";
 let teamMemberLabel = "Members";
 const winnerStr = "Winner";
@@ -23,10 +24,10 @@ const statusStr = "status";
 const awardTitleStr = "award";
 const teamMembersStr = "teamMembers";
 const ldapStr = "empLdap";
-const positionStr = "position";
+const positionStr = "empTitle";
 const managerNameStr = "managerName";
 const imageStr = "image";
-const acsFunctionStr = "function";
+const acsFunctionStr = "category";
 const nameStr = "empName";
 const descriptionStr = "citation";
 
@@ -62,7 +63,7 @@ function changeTabs(e) {
   }
   else {
     const { target } = e;
-    let awardsTitle = target.textContent;
+    awardsTitle = target.textContent;
     let winnerFilter = {};
     winnerFilter[yearStr] = year;
     if (quarter != undefined) {
@@ -284,47 +285,53 @@ function getFilteredData(data, filterName) {
 function createResultDiv(quarterWinnerData, quarterNomineeData) {
   let content = "";
   if (quarterWinnerData?.length) {
-    let winnerData = quarterWinnerData ? quarterWinnerData[0] : {};
     let nomineeContent = "";
     for (let nomineeData of quarterNomineeData) {
       nomineeContent += createNomineeDiv(nomineeData);
     }
-    let teamMemberContent = "";
-    let postionText = winnerData[positionStr];
-    
-    if (winnerData[teamMembersStr]?.length) {
-      postionText = winnerData[managerNameStr];
-      let teamMembers = winnerData[teamMembersStr].trim().split(",");
-      let trimedTeamMembers = teamMembers.map(str => str.trim());
-      teamMemberContent = "<span class=\"team-members\">" + teamMemberLabel + ": " + trimedTeamMembers.join(" | ") + "</span>";
-    }
-    let imageSrc = winnerData[ldapStr] + pngStr;
-    if (winnerData[imageStr]) {
-      imageSrc = winnerData[imageStr];
+    let winnerContent = "";
+    for (let winnerData of quarterWinnerData) {
+      winnerContent += createWinnersDiv(winnerData);
     }
     let nomineeSection = quarterNomineeData?.length ? "<h4 class=\"award-result-sub-heading\">" + otherNomineesLabel + "</h4>" +
       "<section class=\"award-result-nominees\">" +
       nomineeContent +
       "</section>" : "";
     content = "<div class=\"award-result\">" +
-      "<h2 class=\"award-result-heading\">" + winnerData[awardTitleStr] + "</h2>" +
-      "<section class=\"award-result-winner\">" +
-      " <object class=\"award-result-winner-photo\" data=\"/profile/" + imageSrc + "\" type=\"image/png\">" +
-      "   <img class=\"award-result-winner-photo\" src=\"/profile/default.png\" alt=\"" + winnerData[ldapStr] + "\" width=\"400\" height=\"300\">" +
-      " </object>" +
-      "    <section class=\"award-result-winner-details\">" +
-      "        <span class=\"position\">" + postionText + ", " + winnerData[acsFunctionStr] + "</span>" +
-      "        <span class=\"name\">" + winnerData[nameStr] + "</span>" +
-      "        <span class=\"description\">" + winnerData[descriptionStr] + "</span>" +
-      teamMemberContent +
-      "    </section>" +
-      "</section>" +
+      "<h2 class=\"award-result-heading\">" + awardsTitle + "</h2>" +
+      winnerContent +
       nomineeSection +
       "</div>";
   }
   return content;
 }
+function createWinnersDiv(winnerData) {
+  let teamMemberContent = "";
+  let postionText = winnerData[positionStr];
+  if (winnerData[teamMembersStr]?.length) {
+    postionText = winnerData[managerNameStr];
+    let teamMembers = winnerData[teamMembersStr].trim().split(",");
+    let trimedTeamMembers = teamMembers.map(str => str.trim());
+    teamMemberContent = "<span class=\"team-members\">" + teamMemberLabel + ": " + trimedTeamMembers.join(" | ") + "</span>";
+  }
+  let imageSrc = winnerData[ldapStr] + pngStr;
+  if (winnerData[imageStr]) {
+    imageSrc = winnerData[imageStr];
+  }
+  let content = "<section class=\"award-result-winner\">" +
+    " <object class=\"award-result-winner-photo\" data=\"/profile/" + imageSrc + "\" type=\"image/png\">" +
+    "   <img class=\"award-result-winner-photo\" src=\"/profile/default.png\" alt=\"" + winnerData[ldapStr] + "\" width=\"400\" height=\"300\">" +
+    " </object>" +
+    "    <section class=\"award-result-winner-details\">" +
+    "        <span class=\"position\">" + postionText + ", " + winnerData[acsFunctionStr] + "</span>" +
+    "        <span class=\"name\">" + winnerData[nameStr] + "</span>" +
+    "        <span class=\"description\">" + winnerData[descriptionStr] + "</span>" +
+    teamMemberContent +
+    "    </section>" +
+    "</section>";
 
+  return content;
+}
 function createNomineeDiv(nomineeData) {
   let postionText = nomineeData[positionStr];
   if (nomineeData[teamMembersStr]?.length) {
