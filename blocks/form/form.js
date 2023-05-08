@@ -1,6 +1,4 @@
 const FUNCTIONAL = 'Functional';
-const BEGIN_DATE = new Date('1900-01-01');// Set start date as January 1st, 1900
-const MILISECONDS_PER_DAY = 24 * 60 * 60 * 1000; // Number of milliseconds in a day
 const CURRENT_DATE = new Date(); // Get current date
 
 function createSelect(fd) {
@@ -148,7 +146,7 @@ function hideShowFormFields(e) {
             document.getElementsByClassName('form-teamMembers-wrapper')[0].setAttribute('hidden', '');
         } else if (selectedValue.startsWith("Rockstars")) {
             document.getElementsByClassName('form-teamMembers-wrapper')[0].setAttribute('hidden', '');
-        } 
+        }
         let entry = getFilteredAwardCategories(records.data, value);
         entry.options.split(',').forEach((o) => {
             const option = document.createElement('option');
@@ -184,8 +182,8 @@ function getFilteredAwardCategories(records, key) {
 }
 
 function showHideSubmitButton(configEntry) {
-    const endDate = new Date(BEGIN_DATE.getTime() + (configEntry.endDate * MILISECONDS_PER_DAY)); // Calculate end date by adding milliseconds
-    const startDate = new Date(BEGIN_DATE.getTime() + (configEntry.startDate * MILISECONDS_PER_DAY)); // Calculate end date by adding milliseconds
+    const endDate = excelDateToJSDate(configEntry.endDate);
+    const startDate = excelDateToJSDate(configEntry.startDate);
     let btnSubmit = document.getElementsByName('btnSubmit')[0];
     if (startDate <= CURRENT_DATE && endDate < CURRENT_DATE) {
         btnSubmit.setAttribute('disabled', '');
@@ -197,25 +195,37 @@ function showHideSubmitButton(configEntry) {
         btnSubmit.classList.contains('button') ? '' : btnSubmit.classList.add('button');
     }
 }
+function excelDateToJSDate(serial) {
 
+    let utc_days = Math.floor(serial - 25569);
+    let utc_value = utc_days * 86400;
+    let date_info = new Date(utc_value * 1000);/* ā */
+    let fractional_day = serial - Math.floor(serial) + 0.0000001;
+    let total_seconds = Math.floor(86400 * fractional_day);
+    let seconds = total_seconds % 60;
+    total_seconds -= seconds;
+    let hours = Math.floor(total_seconds / (60 * 60));
+    let minutes = Math.floor(total_seconds / 60) % 60;
+    return new Date(date_info.getFullYear(), date_info.getMonth(), date_info.getDate(), hours, minutes, seconds);
+
+}
 function showNominationStatus(records) {
     var formInfoDom = document.createElement('div');
     records.data.forEach((record) => {
-        let nominationEndDate = new Date(BEGIN_DATE.getTime() + (record.endDate * MILISECONDS_PER_DAY));
-        let nominationStartDate = new Date(BEGIN_DATE.getTime() + (record.startDate * MILISECONDS_PER_DAY));
-        console.log("start "+nominationStartDate+ " end date "+nominationEndDate);
+        let nominationEndDate = excelDateToJSDate(record.endDate);
+        let nominationStartDate = excelDateToJSDate(record.startDate);
         if (CURRENT_DATE >= nominationStartDate && CURRENT_DATE < nominationEndDate) {
             var nominationInfo = document.createElement('p');
-            nominationInfo.textContent= 'Nomination is open' + ' for '+record.category +' till ' + nominationEndDate.toDateString();
+            nominationInfo.textContent = 'Nomination is open' + ' for ' + record.category + ' till ' + nominationEndDate.toDateString();
             nominationInfo.style.color = 'green';
         } else {
             var nominationInfo = document.createElement('p');
-            nominationInfo.textContent= 'Nomination has been closed' + ' for '+record.category + ' on ' + nominationEndDate.toDateString();
+            nominationInfo.textContent = 'Nomination has been closed' + ' for ' + record.category + ' on ' + nominationEndDate.toDateString();
             nominationInfo.style.color = 'red';
         }
         formInfoDom.append(nominationInfo);
-    })  
-    return formInfoDom;  
+    })
+    return formInfoDom;
 }
 let records = {}
 async function createForm(formURL) {
@@ -231,11 +241,9 @@ async function createForm(formURL) {
     const validityresp = await fetch(checkValidityFormURL, { cache: 'no-cache', mode: 'cors' });
     records = await validityresp.json();
     console.debug(records);
-    const endDate = new Date(BEGIN_DATE.getTime() + (records.data[0].endDate * MILISECONDS_PER_DAY)); // Calculate end date by adding milliseconds
-    const startDate = new Date(BEGIN_DATE.getTime() + (records.data[0].startDate * MILISECONDS_PER_DAY)); // Calculate end date by adding milliseconds
-    console.debug('startDate -', startDate);
-    console.debug('endDate -', endDate);
-    console.debug('CURRENT_DATE - ', CURRENT_DATE)
+    //const endDate = new Date(BEGIN_DATE.getTime() + (records.data[0].endDate * MILISECONDS_PER_DAY)); // Calculate end date by adding milliseconds
+    const endDate = excelDateToJSDate(records.data[0].endDate);
+    const startDate = excelDateToJSDate(records.data[0].startDate);
     if (CURRENT_DATE >= startDate && CURRENT_DATE < endDate) {
         //TODO set a flag 
         console.debug('current date in range , nomination open')
