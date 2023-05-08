@@ -100,7 +100,7 @@ main .form .button {
     border-radius: 16px;
     font-size: var(--type-body-s-size);
     font-weight: 300;
-    padding: 6px 16px;
+    padding: 8px 16px;
     border: none;
     font-family: adobe-clean, 'Trebuchet MS', sans-serif;
     width: 100px;
@@ -121,6 +121,7 @@ main .form .disabledButton {
 .button.button-secondary {
     background: rgb(214, 214, 215) !important;
     color: black !important;
+    margin: 0;
 }
 
 main .form .form-submit-wrapper,
