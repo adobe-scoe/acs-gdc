@@ -1,5 +1,6 @@
 const FUNCTIONAL = 'Functional';
 const CURRENT_DATE = new Date(); // Get current date
+const CURRENT_DATA_TIME_MILLISECONDS = Date.now();
 
 function createSelect(fd) {
     const select = document.createElement('select');
@@ -88,6 +89,9 @@ function createInput(fd) {
     input.setAttribute('class', fd.Style);
     if (fd.Mandatory === 'x') {
         input.setAttribute('required', 'required');
+    }
+    if (fd.Field === 'recordId') {
+        input.setAttribute('value', CURRENT_DATA_TIME_MILLISECONDS);
     }
     return input;
 }
@@ -196,7 +200,6 @@ function showHideSubmitButton(configEntry) {
     }
 }
 function excelDateToJSDate(serial) {
-
     let utc_days = Math.floor(serial - 25569);
     let utc_value = utc_days * 86400;
     let date_info = new Date(utc_value * 1000);/* ā */
@@ -283,6 +286,9 @@ async function createForm(formURL) {
                 fieldWrapper.append(createInput(fd));
                 fieldWrapper.append(createLabel(fd));
                 break;
+            case 'hidden':
+                fieldWrapper.append(createInput(fd));
+                break;
             case 'text-area':
                 fieldWrapper.append(createLabel(fd));
                 fieldWrapper.append(createTextArea(fd));
@@ -312,7 +318,6 @@ async function createForm(formURL) {
 
     form.addEventListener('change', () => applyRules(form, rules));
     applyRules(form, rules);
-    //hideShowFormFields(document.getElementById('teamMembers'));
     return (form);
 }
 
