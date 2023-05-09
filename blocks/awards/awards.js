@@ -276,7 +276,7 @@ async function fetchData(path) {
 function getFilteredData(data, filterName) {
   for (let [key, value] of Object.entries(filterName)) {
     data = data.filter(function (entry) {
-      return entry[key].toLowerCase() === value.toLowerCase();
+      return entry[key]?.toLowerCase() === value.toLowerCase();
     });
   }
   return data;
