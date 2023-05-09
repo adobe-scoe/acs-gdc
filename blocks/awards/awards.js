@@ -17,6 +17,8 @@ const pathStr = 'path';
 const otherNomineesStr = 'other-nominees-label';
 const teamMemberStr = 'team-member-label';
 const pngStr = ".png";
+const resultsSheetStr = "results";
+const dataId = "recordId";
 
 const yearStr = "year";
 const quarterStr = "quarter";
@@ -268,10 +270,27 @@ const init = (block) => {
   initTabs(block, config, rootElem);
 };
 async function fetchData(path) {
-  const response = await fetch(path);
-  const jsonData = await response.json();
-  excelData = jsonData.data;
+  const nominationResponse = await fetch(path);
+  const nominationJsonData = await nominationResponse.json();
+  const resultsResponse = await fetch(`${path}?sheet=${resultsSheetStr}`);
+  const resultsJsonData = await resultsResponse.json();
+  excelData = mergeArraysById(nominationJsonData.data, resultsJsonData.data)
+  console.log(excelData);
 }
+
+const mergeArraysById = (nominationArr = [], resultsArray = []) => {
+  let res = [];
+  res = nominationArr.map(obj => {
+    const index = resultsArray.findIndex(el => el[dataId] == obj[dataId]);
+    const { status, image } = index !== -1 ? resultsArray[index] : {};
+    return {
+      ...obj,
+      status,
+      image
+    };
+  });
+  return res;
+};
 
 function getFilteredData(data, filterName) {
   for (let [key, value] of Object.entries(filterName)) {
@@ -314,12 +333,12 @@ function createWinnersDiv(winnerData) {
     let trimedTeamMembers = teamMembers.map(str => str.trim());
     teamMemberContent = "<span class=\"team-members\">" + teamMemberLabel + ": " + trimedTeamMembers.join(" | ") + "</span>";
   }
-  let imageSrc = winnerData[ldapStr] + pngStr;
+  let imageSrc = "/profile/" + winnerData[ldapStr] + pngStr;
   if (winnerData[imageStr]) {
     imageSrc = winnerData[imageStr];
   }
   let content = "<section class=\"award-result-winner\">" +
-    " <object class=\"award-result-winner-photo\" data=\"/profile/" + imageSrc + "\" type=\"image/png\">" +
+    " <object class=\"award-result-winner-photo\" data=\"" + imageSrc + "\" type=\"image/png\">" +
     "   <img class=\"award-result-winner-photo\" src=\"/profile/default.png\" alt=\"" + winnerData[ldapStr] + "\" width=\"400\" height=\"300\">" +
     " </object>" +
     "    <section class=\"award-result-winner-details\">" +
@@ -337,12 +356,12 @@ function createNomineeDiv(nomineeData) {
   if (nomineeData[teamMembersStr]?.length) {
     postionText = nomineeData[managerNameStr]
   }
-  let imageSrc = nomineeData[ldapStr] + pngStr;
+  let imageSrc = "/profile/" + nomineeData[ldapStr] + pngStr;
   if (nomineeData[imageStr]) {
     imageSrc = nomineeData[imageStr];
   }
   let content = "<section class=\"award-result-nominee\">" +
-    " <object class=\"award-result-nominee-photo\" data=\"/profile/" + imageSrc + "\" type=\"image/png\">" +
+    " <object class=\"award-result-nominee-photo\" data=\"" + imageSrc + "\" type=\"image/png\">" +
     "   <img class=\"award-result-nominee-photo\" src=\"/profile/default.png\" alt=\"" + nomineeData[ldapStr] + "\" width=\"74\" height=\"72\">" +
     " </object>" +
     "        <section class=\"award-result-nominee-details\">" +

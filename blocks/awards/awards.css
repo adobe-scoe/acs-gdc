@@ -268,6 +268,7 @@
     max-width: 70%;
     margin-bottom: 28px;
     border: none;
+    flex: 1;
 
 }
 
@@ -302,7 +303,7 @@
     display: flex;
     flex-direction: column;
     margin: 12px 24px;
-    width: 40%;
+    flex: 1;
 }
 
 .award-result-winner-details>span,
@@ -354,12 +355,12 @@
 
 .award-result-winner-photo {
     height: auto;
-    max-width: 100%;
+    width: 400px;
     padding: 1px 0;
 }
 
 .award-result-nominee-photo {
-    max-width: 100%;
+    width: 74px;
     height: auto;
     padding: 1px 0;
 }
@@ -368,7 +369,7 @@
     display: flex;
     flex-direction: column;
     margin: 0 20px;
-    width: 70%;
+    flex: 1;
 }
 
 .award-result-nominee-details span.position {
@@ -379,4 +380,54 @@
 .award-result-nominee-details span.name {
     font-size: 18px;
     font-weight: bold;
+}
+
+@media screen and (max-width: 767px) {
+    .vertical-tabs {
+        flex-direction: column;
+    }
+
+    .tabs .vertical-tabs div[role="tablist"] button[aria-selected="true"],
+    .tabs .vertical-tabs div[role="tablist"] button[aria-selected="false"] {
+        text-align: left;
+    }
+
+    .awards.vertical-tabs>.tabList {
+        max-width: 100%;
+    }
+
+    .vertical-tabs>.tab-content {
+        max-width: 100%;
+        margin-top: 24px;
+    }
+
+    .award-result-winner {
+        flex-direction: column;
+    }
+
+    .award-result-winner-details {
+        flex: 1;
+        width: 100%;
+        margin: 12px 6px 12px 0;
+    }
+
+    .award-result-nominee {
+        flex-direction: column;
+    }
+
+    .award-result-nominee-details {
+        margin-left: 0;
+    }
+
+    .award-result-winner-photo {
+        height: auto;
+        max-width: 100%;
+        padding: 1px 0;
+    }
+
+    .award-result-nominee-photo {
+        max-width: 100%;
+        height: auto;
+        padding: 1px 0;
+    }
 }
