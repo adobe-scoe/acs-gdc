@@ -353,14 +353,14 @@
 }
 
 .award-result-winner-photo {
-    height: 300px;
-    width: 400px;
+    height: auto;
+    max-width: 100%;
     padding: 1px 0;
 }
 
 .award-result-nominee-photo {
-    width: 74px;
-    height: 72px;
+    max-width: 100%;
+    height: auto;
     padding: 1px 0;
 }
 
