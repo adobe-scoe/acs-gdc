@@ -2,7 +2,9 @@ main .form {
     background-color: white;
     padding: var(--spacing-m);
     box-shadow: 0 1px 6px rgb(34 34 34 / 10%);
-    margin: 0 20% 0 20%;
+    max-width: 800px;
+    margin: 0 auto;
+
 }
 
 main .form h2 {
@@ -10,6 +12,7 @@ main .form h2 {
     font-size: var(--type-heading-l-lh);
     font-weight: normal;
 }
+
 
 main .form h3 {
     padding-top: var(--spacing-m);
@@ -24,7 +27,7 @@ main .form select {
     border: 1px solid rgb(193 193 195);
     padding: 11px;
     border-radius: 0;
-    width: 100%;
+    width: 50%;
     max-width: 50rem;
     box-sizing: border-box;
     margin-top: 4px;
@@ -40,7 +43,7 @@ main .form select:hover {
 }
 
 main .form label {
-    width: 100%;
+    width: 50%;
     display: block;
     font-size: var(--type-body-s-size);
     line-height: var(--type-body-s-lh);
@@ -58,6 +61,11 @@ main .form label.required::after {
 
 main .form .field-wrapper {
     margin-bottom: 20px;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 12px 0;
 }
 
 main .form .form-checkbox-wrapper {
