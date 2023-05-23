@@ -6,3 +6,10 @@
  * 
  *
  */
+
+ .tabs div[role="tablist"] button[aria-selected="true"] {
+  background: var(--tabs-active-bg-color); 
+  border-color: transparent transparent #2680EB transparent !important;
+  border-width: 3px;
+  color: var(--tabs-active-text-color);
+}
