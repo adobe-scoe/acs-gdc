@@ -68,6 +68,10 @@ main .form .field-wrapper {
     padding: 12px 0;
 }
 
+main .form .field-wrapper[hidden] {
+    display: none;
+}
+
 main .form .form-checkbox-wrapper {
     display: flex;
     margin: var(--spacing-s) 0;
