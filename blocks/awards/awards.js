@@ -30,9 +30,12 @@ const positionStr = "empTitle";
 const managerNameStr = "managerName";
 const imageStr = "image";
 const acsFunctionStr = "acsFunction";
-const category = "category";
+const categoryStr = "category";
+const ahmStr = "AHM";
+
 const nameStr = "empName";
 const descriptionStr = "citation";
+const noRecordStr = " (No nomination and winner for this award)";
 
 const d = new Date();
 const year = d.getFullYear().toString();
@@ -276,7 +279,6 @@ async function fetchData(path) {
   const resultsResponse = await fetch(`${path}?sheet=${resultsSheetStr}`);
   const resultsJsonData = await resultsResponse.json();
   excelData = mergeArraysById(nominationJsonData.data, resultsJsonData.data)
-  console.log(excelData);
 }
 
 const mergeArraysById = (nominationArr = [], resultsArray = []) => {
@@ -304,39 +306,35 @@ function getFilteredData(data, filterName) {
 
 function createResultDiv(quarterWinnerData, quarterNomineeData) {
   let content = "";
+  let nomineeSection = "";
+  let winnerContent = "";
+
   if (quarterWinnerData?.length) {
     let nomineeContent = "";
     for (let nomineeData of quarterNomineeData) {
       nomineeContent += createNomineeDiv(nomineeData);
     }
-    let winnerContent = "";
     for (let winnerData of quarterWinnerData) {
       winnerContent += createWinnersDiv(winnerData);
     }
-    let nomineeSection = quarterNomineeData?.length ? "<h4 class=\"award-result-sub-heading\">" + otherNomineesLabel + "</h4>" +
+    nomineeSection = quarterNomineeData?.length ? "<h4 class=\"award-result-sub-heading\">" + otherNomineesLabel + "</h4>" +
       "<section class=\"award-result-nominees\">" +
       nomineeContent +
       "</section>" : "";
-    content = "<div class=\"award-result\">" +
-      "<h2 class=\"award-result-heading\">" + awardsTitle + "</h2>" +
-      winnerContent +
-      nomineeSection +
-      "</div>";
+  } else {
+    awardsTitle += noRecordStr;
   }
+  content = "<div class=\"award-result\">" +
+    "<h2 class=\"award-result-heading\">" + awardsTitle + "</h2>" +
+    winnerContent +
+    nomineeSection +
+    "</div>";
+
   return content;
 }
-function getAcsFunction(data) {
-  let acsFunction
-  if(data[category] === 'AHM') {
-    acsFunction = data[acsFunctionStr]
-  } else {
-    acsFunction = data[category]
-  }
-  return acsFunction;
-}
 function createWinnersDiv(winnerData) {
+  const acsFunction = winnerData[categoryStr] === ahmStr ? winnerData[acsFunctionStr] : winnerData[categoryStr];
   let teamMemberContent = "";
-  
   let postionText = winnerData[positionStr];
   if (winnerData[teamMembersStr]?.length) {
     postionText = winnerData[managerNameStr];
@@ -353,7 +351,7 @@ function createWinnersDiv(winnerData) {
     "   <img class=\"award-result-winner-photo\" src=\"/profile/default.png\" alt=\"" + winnerData[ldapStr] + "\" width=\"400\" height=\"300\">" +
     " </object>" +
     "    <section class=\"award-result-winner-details\">" +
-    "        <span class=\"position\">" + postionText + ", " + getAcsFunction(winnerData) + "</span>" +
+    "        <span class=\"position\">" + postionText + ", " + acsFunction + "</span>" +
     "        <span class=\"name\">" + winnerData[nameStr] + "</span>" +
     "        <span class=\"description\">" + winnerData[descriptionStr] + "</span>" +
     teamMemberContent +
@@ -363,6 +361,7 @@ function createWinnersDiv(winnerData) {
   return content;
 }
 function createNomineeDiv(nomineeData) {
+  const acsFunction = nomineeData[categoryStr] === ahmStr ? nomineeData[acsFunctionStr] : nomineeData[categoryStr];
   let postionText = nomineeData[positionStr];
   if (nomineeData[teamMembersStr]?.length) {
     postionText = nomineeData[managerNameStr]
@@ -376,7 +375,7 @@ function createNomineeDiv(nomineeData) {
     "   <img class=\"award-result-nominee-photo\" src=\"/profile/default.png\" alt=\"" + nomineeData[ldapStr] + "\" width=\"74\" height=\"72\">" +
     " </object>" +
     "        <section class=\"award-result-nominee-details\">" +
-    "            <span class=\"position\">" + postionText + ", " + getAcsFunction(nomineeData) + "</span>" +
+    "            <span class=\"position\">" + postionText + ", " + acsFunction + "</span>" +
     "            <span class=\"name\">" + nomineeData[nameStr] + "</span>" +
     "        </section>" +
     "    </section>";
