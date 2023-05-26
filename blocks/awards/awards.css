@@ -278,7 +278,7 @@
 }
 
 .award-result-heading {
-    font-size: 44px;
+    font-size: 24px;
     font-weight: bold;
     margin: 0 0 12px 0;
     color: #2C2C2C;
@@ -355,7 +355,7 @@
 
 .award-result-winner-photo {
     height: auto;
-    width: 400px;
+    width: 250px;
     padding: 1px 0;
 }
 
