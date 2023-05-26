@@ -29,7 +29,8 @@ const ldapStr = "empLdap";
 const positionStr = "empTitle";
 const managerNameStr = "managerName";
 const imageStr = "image";
-const acsFunctionStr = "category";
+const acsFunctionStr = "acsFunction";
+const category = "category";
 const nameStr = "empName";
 const descriptionStr = "citation";
 
@@ -324,8 +325,18 @@ function createResultDiv(quarterWinnerData, quarterNomineeData) {
   }
   return content;
 }
+function getAcsFunction(data) {
+  let acsFunction
+  if(data[category] === 'AHM') {
+    acsFunction = data[acsFunctionStr]
+  } else {
+    acsFunction = data[category]
+  }
+  return acsFunction;
+}
 function createWinnersDiv(winnerData) {
   let teamMemberContent = "";
+  
   let postionText = winnerData[positionStr];
   if (winnerData[teamMembersStr]?.length) {
     postionText = winnerData[managerNameStr];
@@ -342,7 +353,7 @@ function createWinnersDiv(winnerData) {
     "   <img class=\"award-result-winner-photo\" src=\"/profile/default.png\" alt=\"" + winnerData[ldapStr] + "\" width=\"400\" height=\"300\">" +
     " </object>" +
     "    <section class=\"award-result-winner-details\">" +
-    "        <span class=\"position\">" + postionText + ", " + winnerData[acsFunctionStr] + "</span>" +
+    "        <span class=\"position\">" + postionText + ", " + getAcsFunction(winnerData) + "</span>" +
     "        <span class=\"name\">" + winnerData[nameStr] + "</span>" +
     "        <span class=\"description\">" + winnerData[descriptionStr] + "</span>" +
     teamMemberContent +
@@ -365,7 +376,7 @@ function createNomineeDiv(nomineeData) {
     "   <img class=\"award-result-nominee-photo\" src=\"/profile/default.png\" alt=\"" + nomineeData[ldapStr] + "\" width=\"74\" height=\"72\">" +
     " </object>" +
     "        <section class=\"award-result-nominee-details\">" +
-    "            <span class=\"position\">" + postionText + ", " + nomineeData[acsFunctionStr] + "</span>" +
+    "            <span class=\"position\">" + postionText + ", " + getAcsFunction(nomineeData) + "</span>" +
     "            <span class=\"name\">" + nomineeData[nameStr] + "</span>" +
     "        </section>" +
     "    </section>";

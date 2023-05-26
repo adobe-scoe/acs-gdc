@@ -164,11 +164,13 @@ function hideShowFormFields(e) {
       document.getElementsByClassName('form-empLdap-wrapper')[0].setAttribute('hidden', '');
       document.getElementsByClassName('form-empId-wrapper')[0].setAttribute('hidden', '');
       document.getElementsByClassName('form-empTitle-wrapper')[0].setAttribute('hidden', '');
+      document.getElementsByClassName('form-acsFunction-wrapper')[0].setAttribute('hidden', '');
       document.getElementsByClassName('form-teamMembers-wrapper')[0].removeAttribute('hidden');
     } else {
       document.getElementsByClassName('form-empLdap-wrapper')[0].removeAttribute('hidden');
       document.getElementsByClassName('form-empId-wrapper')[0].removeAttribute('hidden');
       document.getElementsByClassName('form-empTitle-wrapper')[0].removeAttribute('hidden');
+      document.getElementsByClassName('form-acsFunction-wrapper')[0].removeAttribute('hidden');
       document.getElementsByClassName('form-teamMembers-wrapper')[0].setAttribute('hidden', '');
     }
   }
