@@ -35,7 +35,7 @@ const ahmStr = "AHM";
 
 const nameStr = "empName";
 const descriptionStr = "citation";
-const noRecordStr = " (No nomination and winner for this award)";
+const noRecordStr = "No nomination and winner for this award";
 
 const d = new Date();
 const year = d.getFullYear().toString();
@@ -305,58 +305,58 @@ function getFilteredData(data, filterName) {
 }
 
 function createResultDiv(quarterWinnerData, quarterNomineeData) {
-  let content = "";
-  let nomineeSection = "";
-  let winnerContent = "";
+  let content = '';
+  let nomineeSection = '';
+  let winnerContent = '';
+  let noResultSection = '';
 
   if (quarterWinnerData?.length) {
-    let nomineeContent = "";
+    let nomineeContent = '';
     for (let nomineeData of quarterNomineeData) {
       nomineeContent += createNomineeDiv(nomineeData);
     }
     for (let winnerData of quarterWinnerData) {
       winnerContent += createWinnersDiv(winnerData);
     }
-    nomineeSection = quarterNomineeData?.length ? "<h4 class=\"award-result-sub-heading\">" + otherNomineesLabel + "</h4>" +
-      "<section class=\"award-result-nominees\">" +
-      nomineeContent +
-      "</section>" : "";
+    nomineeSection = quarterNomineeData?.length ? `<h4 class="award-result-sub-heading">${otherNomineesLabel}</h4>` +
+      `<section class="award-result-nominees">${nomineeContent}</section>` : '';
   } else {
-    awardsTitle += noRecordStr;
+    noResultSection = `<p class="no-result">${noRecordStr}</p>`;
   }
-  content = "<div class=\"award-result\">" +
-    "<h2 class=\"award-result-heading\">" + awardsTitle + "</h2>" +
+  content = '<div class="award-result">' +
+    `<h2 class="award-result-heading">${awardsTitle}</h2>` +
+    noResultSection +
     winnerContent +
     nomineeSection +
-    "</div>";
+    '</div>';
 
   return content;
 }
 function createWinnersDiv(winnerData) {
   const acsFunction = winnerData[categoryStr] === ahmStr ? winnerData[acsFunctionStr] : winnerData[categoryStr];
-  let teamMemberContent = "";
+  let teamMemberContent = '';
   let postionText = winnerData[positionStr];
   if (winnerData[teamMembersStr]?.length) {
     postionText = winnerData[managerNameStr];
     let teamMembers = winnerData[teamMembersStr].trim().split(",");
     let trimedTeamMembers = teamMembers.map(str => str.trim());
-    teamMemberContent = "<span class=\"team-members\">" + teamMemberLabel + ": " + trimedTeamMembers.join(" | ") + "</span>";
+    teamMemberContent = `<span class="team-members">${teamMemberLabel}: ${trimedTeamMembers.join(' | ')}</span>`;
   }
   let imageSrc = "/profile/" + winnerData[ldapStr] + pngStr;
   if (winnerData[imageStr]) {
     imageSrc = winnerData[imageStr];
   }
-  let content = "<section class=\"award-result-winner\">" +
-    " <object class=\"award-result-winner-photo\" data=\"" + imageSrc + "\" type=\"image/png\">" +
-    "   <img class=\"award-result-winner-photo\" src=\"/profile/default.png\" alt=\"" + winnerData[ldapStr] + "\" width=\"400\" height=\"300\">" +
-    " </object>" +
-    "    <section class=\"award-result-winner-details\">" +
-    "        <span class=\"position\">" + postionText + ", " + acsFunction + "</span>" +
-    "        <span class=\"name\">" + winnerData[nameStr] + "</span>" +
-    "        <span class=\"description\">" + winnerData[descriptionStr] + "</span>" +
+  let content = '<section class="award-result-winner">' +
+    ` <object class="award-result-winner-photo" data="${imageSrc}" type="image/png">` +
+    `   <img class="award-result-winner-photo" src="/profile/default.png" alt="${winnerData[ldapStr]}">` +
+    ' </object>' +
+    '    <section class="award-result-winner-details">' +
+    `        <span class="position">${postionText}, ${acsFunction}</span>` +
+    `        <span class="name">${winnerData[nameStr]}</span>` +
+    `        <span class="description">${winnerData[descriptionStr]}</span>` +
     teamMemberContent +
-    "    </section>" +
-    "</section>";
+    '    </section>' +
+    '</section>';
 
   return content;
 }
@@ -370,15 +370,15 @@ function createNomineeDiv(nomineeData) {
   if (nomineeData[imageStr]) {
     imageSrc = nomineeData[imageStr];
   }
-  let content = "<section class=\"award-result-nominee\">" +
-    " <object class=\"award-result-nominee-photo\" data=\"" + imageSrc + "\" type=\"image/png\">" +
-    "   <img class=\"award-result-nominee-photo\" src=\"/profile/default.png\" alt=\"" + nomineeData[ldapStr] + "\" width=\"74\" height=\"72\">" +
-    " </object>" +
-    "        <section class=\"award-result-nominee-details\">" +
-    "            <span class=\"position\">" + postionText + ", " + acsFunction + "</span>" +
-    "            <span class=\"name\">" + nomineeData[nameStr] + "</span>" +
-    "        </section>" +
-    "    </section>";
+  let content = '<section class="award-result-nominee">' +
+    ` <object class="award-result-nominee-photo" data="${imageSrc}" type="image/png">` +
+    `   <img class="award-result-nominee-photo" src="/profile/default.png" alt="${nomineeData[ldapStr]}">` +
+    ' </object>' +
+    '        <section class="award-result-nominee-details">' +
+    `            <span class="position">${postionText + ", " + acsFunction}</span>` +
+    `            <span class="name">${nomineeData[nameStr]}</span>` +
+    '        </section>' +
+    '    </section>';
   return content;
 }
 export default init;
