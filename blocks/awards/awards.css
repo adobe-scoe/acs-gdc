@@ -286,6 +286,10 @@
     flex-direction: column;
 }
 
+.award-result .no-result{
+    margin: 0;
+}
+
 .award-result-heading {
     font-size: 32px;
     font-weight: bold;
