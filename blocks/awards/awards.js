@@ -351,7 +351,7 @@ function createWinnersDiv(winnerData) {
     `   <img class="award-result-winner-photo" src="/profile/default.png" alt="${winnerData[ldapStr]}">` +
     ' </object>' +
     '    <section class="award-result-winner-details">' +
-    `        <span class="position">${postionText}, ${acsFunction}</span>` +
+    `        <span class="position">${[postionText, acsFunction].filter(elem => elem).join(", ")}</span>` +
     `        <span class="name">${winnerData[nameStr]}</span>` +
     `        <span class="description">${winnerData[descriptionStr]}</span>` +
     teamMemberContent +
@@ -375,7 +375,7 @@ function createNomineeDiv(nomineeData) {
     `   <img class="award-result-nominee-photo" src="/profile/default.png" alt="${nomineeData[ldapStr]}">` +
     ' </object>' +
     '        <section class="award-result-nominee-details">' +
-    `            <span class="position">${postionText + ", " + acsFunction}</span>` +
+    `            <span class="position">${[postionText, acsFunction].filter(elem => elem).join(", ")}</span>` +
     `            <span class="name">${nomineeData[nameStr]}</span>` +
     '        </section>' +
     '    </section>';

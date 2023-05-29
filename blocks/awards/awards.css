@@ -286,7 +286,7 @@
     flex-direction: column;
 }
 
-.award-result .no-result{
+.award-result .no-result {
     margin: 0;
 }
 
@@ -321,30 +321,27 @@
 .award-result-winner-details>span,
 .award-result-nominee-details>span {
     color: #2C2C2C;
+    line-height: 1.5;
 }
 
 .award-result-winner-details>span.position {
     font-size: 12px;
     font-weight: bold;
-    line-height: 1;
 }
 
 .award-result-winner-details>span.name {
     font-size: 18px;
     font-weight: bold;
-    line-height: 2;
 }
 
 .award-result-winner-details>span.description {
     font-size: 16px;
     font-weight: normal;
-    line-height: 1.5;
 }
 
 .award-result-winner-details>span.team-members {
     font-size: 16px;
     font-weight: normal;
-    line-height: 1.5;
     margin: 16px 0;
 }
 
@@ -389,9 +386,10 @@
 }
 
 @media screen and (max-width: 768px) {
-    .tabs>.tab-content{
+    .tabs>.tab-content {
         margin-top: 1rem;
     }
+
     .vertical-tabs {
         flex-direction: column;
     }
@@ -410,9 +408,11 @@
         max-width: 100%;
         margin-top: 24px;
     }
-    .award-result-heading{
+
+    .award-result-heading {
         font-size: 24px;
     }
+
     .award-result-winner {
         grid-template-columns: 1fr;
         row-gap: 6px;
@@ -422,6 +422,7 @@
         width: 100%;
         padding: 0;
     }
+
     .award-result-nominees {
         grid-template-columns: 1fr;
         column-gap: 0;
