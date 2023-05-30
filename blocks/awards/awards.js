@@ -35,7 +35,7 @@ const ahmStr = "AHM";
 
 const nameStr = "empName";
 const descriptionStr = "citation";
-const noRecordStr = "No nomination and winner for this award";
+const noRecordStr = "There are no awards for this category";
 
 const d = new Date();
 const year = d.getFullYear().toString();
@@ -62,12 +62,7 @@ function changeQuarterTabs(e) {
   document.querySelector(`.quarter-tabs > .tab-content #${tabContent} [role="tab"]`).click();
 }
 function changeTabs(e) {
-  if (excelData == undefined) {
-    setTimeout(function () {
-      changeTabs(e);
-    }, 100);
-  }
-  else {
+  if (excelData) {
     const { target } = e;
     awardsTitle = target.textContent;
     let winnerFilter = {};
@@ -99,6 +94,23 @@ function changeTabs(e) {
       .forEach((p) => p.setAttribute('hidden', true));
     let tabPanel = grandparent.parentNode.querySelector(`#${target.getAttribute('aria-controls')}`);
     tabPanel.innerHTML = createResultSection(quarterWinnerData, quarterNomineeData).outerHTML;
+    tabPanel.removeAttribute('hidden');
+  }
+  else {
+    const { target } = e;
+    awardsTitle = target.textContent;
+    const parent = target.parentNode;
+    const grandparent = parent.parentNode.nextElementSibling;
+    parent
+      .querySelectorAll('[aria-selected="true"]')
+      .forEach((t) => t.setAttribute('aria-selected', false));
+    target.setAttribute('aria-selected', true);
+    scrollTabIntoView(target);
+    grandparent
+      .querySelectorAll('[role="tabpanel"]')
+      .forEach((p) => p.setAttribute('hidden', true));
+    let tabPanel = grandparent.parentNode.querySelector(`#${target.getAttribute('aria-controls')}`);
+    tabPanel.innerHTML = createLoadingSection().outerHTML;
     tabPanel.removeAttribute('hidden');
   }
 }
@@ -278,7 +290,11 @@ async function fetchData(path) {
   const nominationJsonData = await nominationResponse.json();
   const resultsResponse = await fetch(`${path}?sheet=${resultsSheetStr}`);
   const resultsJsonData = await resultsResponse.json();
-  excelData = mergeArraysById(nominationJsonData.data, resultsJsonData.data)
+  excelData = mergeArraysById(nominationJsonData.data, resultsJsonData.data);
+  const quarterTabs = document.querySelectorAll('.quarter-tabs > .tabList [role="tab"]');
+  if (quarterTabs?.length) {
+    quarterTabs[0].click();
+  }
 }
 
 const mergeArraysById = (nominationArr = [], resultsArray = []) => {
@@ -366,6 +382,25 @@ function createNomineeSection(nomineeData) {
   descriptionSection.append(createTag('span', { class: 'position' }, [postionText, acsFunction].filter(elem => elem).join(", ")));
   descriptionSection.append(createTag('span', { class: 'name' }, nomineeData[nameStr]));
   parentSection.append(descriptionSection);
+  return parentSection;
+}
+
+function createLoadingSection() {
+  const parentSection = createTag('div', { class: 'award-result loading-section' });
+  parentSection.append(createTag('h2', { class: 'award-result-heading shine' }));
+  const winnerSection = createTag('section', { class: 'award-result-winner' });
+  winnerSection.append(createTag('section', { class: 'award-result-winner-photo shine' }));
+  winnerSection.append(createTag('section', { class: 'award-result-winner-details shine' }));
+  parentSection.append(winnerSection);
+  parentSection.append(createTag('h4', { class: 'award-result-sub-heading shine' }));
+
+  const nomineeSection = createTag('section', { class: 'award-result-nominees' });
+  const nomineeChildSection = createTag('section', { class: 'award-result-nominee' });
+  nomineeChildSection.append(createTag('section', { class: 'award-result-nominee-photo shine' }));
+  nomineeChildSection.append(createTag('section', { class: 'award-result-nominee-details shine' }));
+  nomineeSection.append(nomineeChildSection);
+  nomineeSection.append(nomineeChildSection.cloneNode(true));
+  parentSection.append(nomineeSection);
   return parentSection;
 }
 export default init;
