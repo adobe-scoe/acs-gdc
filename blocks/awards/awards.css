@@ -280,33 +280,36 @@
     flex: 1;
 
 }
+.award-result-placeholder{
+    margin-bottom: 2rem;;
+}
 
-.loading-section .award-result-heading,
-.loading-section .award-result-winner,
-.loading-section .award-result-nominees,
-.loading-section .award-result-sub-heading {
+.award-result-placeholder .award-result-heading,
+.award-result-placeholder .award-result-winner,
+.award-result-placeholder .award-result-nominees,
+.award-result-placeholder .award-result-sub-heading {
     width: 100%;
 }
 
-.loading-section .award-result-heading {
+.award-result-placeholder .award-result-heading {
     height: 32px;
 }
 
-.loading-section .award-result-winner,
-.loading-section .award-result-nominees {
+.award-result-placeholder .award-result-winner,
+.award-result-placeholder .award-result-nominees {
     height: 250px;
     column-gap: 20px;
 }
 
-.loading-section .award-result-nominees {
-    height: 75px;
+.award-result-placeholder .award-result-nominees {
+    height: 80px;
 }
 
-.loading-section .award-result-sub-heading {
+.award-result-placeholder .award-result-sub-heading {
     height: 24px;
 }
 
-.loading-section .shine {
+.award-result-placeholder .loading-results {
     background: #f6f7f8;
     background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
     background-repeat: no-repeat;
@@ -452,7 +455,7 @@
         margin-top: 24px;
     }
 
-    .loading-section .award-result-nominees {
+    .award-result-placeholder .award-result-nominees {
         height: 20vh;
     }
 
