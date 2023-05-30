@@ -343,7 +343,7 @@ function createResultSection(quarterWinnerData, quarterNomineeData) {
 }
 function createWinnersSection(winnerData) {
   const parentSection = createTag('section', { class: 'award-result-winner' });
-  const acsFunction = winnerData[categoryStr] === ahmStr ? winnerData[acsFunctionStr] : winnerData[categoryStr];
+  const acsFunction = winnerData[acsFunctionStr];
   let teamMemberSection;
   const postionText = winnerData[teamMembersStr]?.length ? winnerData[managerNameStr] : winnerData[positionStr];
   if (winnerData[teamMembersStr]?.length) {
