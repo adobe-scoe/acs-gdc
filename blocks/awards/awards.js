@@ -386,18 +386,18 @@ function createNomineeSection(nomineeData) {
 }
 
 function createLoadingSection() {
-  const parentSection = createTag('div', { class: 'award-result loading-section' });
-  parentSection.append(createTag('h2', { class: 'award-result-heading shine' }));
+  const parentSection = createTag('div', { class: 'award-result award-result-placeholder' });
+  parentSection.append(createTag('h2', { class: 'award-result-heading loading-results' }));
   const winnerSection = createTag('section', { class: 'award-result-winner' });
-  winnerSection.append(createTag('section', { class: 'award-result-winner-photo shine' }));
-  winnerSection.append(createTag('section', { class: 'award-result-winner-details shine' }));
+  winnerSection.append(createTag('section', { class: 'award-result-winner-photo loading-results' }));
+  winnerSection.append(createTag('section', { class: 'award-result-winner-details loading-results' }));
   parentSection.append(winnerSection);
-  parentSection.append(createTag('h4', { class: 'award-result-sub-heading shine' }));
+  parentSection.append(createTag('h4', { class: 'award-result-sub-heading loading-results' }));
 
   const nomineeSection = createTag('section', { class: 'award-result-nominees' });
   const nomineeChildSection = createTag('section', { class: 'award-result-nominee' });
-  nomineeChildSection.append(createTag('section', { class: 'award-result-nominee-photo shine' }));
-  nomineeChildSection.append(createTag('section', { class: 'award-result-nominee-details shine' }));
+  nomineeChildSection.append(createTag('section', { class: 'award-result-nominee-photo loading-results' }));
+  nomineeChildSection.append(createTag('section', { class: 'award-result-nominee-details loading-results' }));
   nomineeSection.append(nomineeChildSection);
   nomineeSection.append(nomineeChildSection.cloneNode(true));
   parentSection.append(nomineeSection);
