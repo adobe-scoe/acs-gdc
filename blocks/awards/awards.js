@@ -369,7 +369,7 @@ function createWinnersSection(winnerData) {
 }
 function createNomineeSection(nomineeData) {
   const parentSection = createTag('section', { class: 'award-result-nominee' });
-  const acsFunction = nomineeData[categoryStr] === ahmStr ? nomineeData[acsFunctionStr] : nomineeData[categoryStr];
+  const acsFunction = nomineeData[acsFunctionStr];
   const postionText = nomineeData[teamMembersStr]?.length ? nomineeData[managerNameStr] : nomineeData[positionStr];
 
   const imageSrc = nomineeData[imageStr] ? nomineeData[imageStr] : '/profile/' + nomineeData[ldapStr] + pngStr;
