@@ -343,7 +343,6 @@ function createResultSection(quarterWinnerData, quarterNomineeData) {
 }
 function createWinnersSection(winnerData) {
   const parentSection = createTag('section', { class: 'award-result-winner' });
-  const acsFunction = winnerData[acsFunctionStr];
   let teamMemberSection;
   const postionText = winnerData[teamMembersStr]?.length ? winnerData[managerNameStr] : winnerData[positionStr];
   if (winnerData[teamMembersStr]?.length) {
@@ -358,7 +357,7 @@ function createWinnersSection(winnerData) {
   parentSection.append(imageSection);
 
   const descriptionSection = createTag('section', { class: 'award-result-winner-details' });
-  descriptionSection.append(createTag('span', { class: 'position' }, [postionText, acsFunction].filter(elem => elem).join(", ")));
+  descriptionSection.append(createTag('span', { class: 'position' }, [postionText, winnerData[acsFunctionStr]].filter(elem => elem).join(", ")));
   descriptionSection.append(createTag('span', { class: 'name' }, winnerData[nameStr]));
   descriptionSection.append(createTag('span', { class: 'description' }, winnerData[descriptionStr]));
   if (teamMemberSection) {
@@ -369,7 +368,6 @@ function createWinnersSection(winnerData) {
 }
 function createNomineeSection(nomineeData) {
   const parentSection = createTag('section', { class: 'award-result-nominee' });
-  const acsFunction = nomineeData[acsFunctionStr];
   const postionText = nomineeData[teamMembersStr]?.length ? nomineeData[managerNameStr] : nomineeData[positionStr];
 
   const imageSrc = nomineeData[imageStr] ? nomineeData[imageStr] : '/profile/' + nomineeData[ldapStr] + pngStr;
@@ -379,7 +377,7 @@ function createNomineeSection(nomineeData) {
   parentSection.append(imageSection);
 
   let descriptionSection = createTag('section', { class: 'award-result-nominee-details' });
-  descriptionSection.append(createTag('span', { class: 'position' }, [postionText, acsFunction].filter(elem => elem).join(", ")));
+  descriptionSection.append(createTag('span', { class: 'position' }, [postionText, nomineeData[acsFunctionStr]].filter(elem => elem).join(", ")));
   descriptionSection.append(createTag('span', { class: 'name' }, nomineeData[nameStr]));
   parentSection.append(descriptionSection);
   return parentSection;
