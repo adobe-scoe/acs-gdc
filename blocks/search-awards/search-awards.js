@@ -34,7 +34,7 @@ function createFilterSection(ele) {
             filterSection.append(filterOptionContainer);
             filterSection.append(createTag('span', { class: 'filter-list-item-toggle' }));
         }
-        else if (filter.type === 'searchbox') {
+        else if (filter.type === 'textfield') {
             filterSection.append(createTag('input', { type: 'text-field', id: filter.id, placeholder: filter.name, class: 'filter-list-item-category', 'data-filter': filter.id }));
         }
         parentSection.append(filterSection);
@@ -63,9 +63,11 @@ function createResultSection(ele) {
 
 function getFilteredData(data, filterName) {
     for (let filter of filterName) {
-        data = data.filter(function (entry) {
-            return entry[filter.value]?.toLowerCase() === filter.selected?.toLowerCase();
-        });
+        if(filter.selected){
+            data = data.filter(function (entry) {
+                return filter?.selected?.toLowerCase() === entry[filter.id]?.toLowerCase();
+            });
+        }
     }
     return data;
 }
@@ -114,7 +116,8 @@ const createFilterData = () => {
             if (!filter.options) {
                 filter.options = Array.from(filterSet);
             }
-            filter.selected = filter.options[0];
+            if (filter.type !== 'textfield')
+                filter.selected = filter.options[0];
 
         }
         console.log('filterByOptions', filterBy);
