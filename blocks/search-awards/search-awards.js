@@ -5,50 +5,71 @@ const { createTag } = await import(`${getLibs()}/utils/utils.js`);
 
 const resultsSheetStr = "results";
 const dataId = "recordId";
+const imageStr = "image";
+const ldapStr = "empLdap";
+const pngStr = ".png";
+const yearStr = "year";
+const quarterStr = "quarter";
+const nameStr = "empName";
+const awardStr = "award";
+const searchResultStr = "Search Results";
+
 let excelData;
+let searchResultData;
 let filterBy = [];
 
 function createFilterSection(ele) {
     const parentSection = createTag('div', { class: 'filter-list' });
     for (let filter of filterBy) {
         const filterSection = createTag('div', { class: 'filter-list-item' });
-        filterSection.append(createTag('span', { class: 'filter-list-item-category' }, filter.key));
-        const filterOptionContainer = createTag('div', { class: 'filter-list-item-container' });
-        filterOptionContainer.append(createTag('span', { class: 'filter-list-item-selected' }));
-        const filterOptionSection = createTag('div', { class: 'filter-list-item-options' });
-        for (let option of filter.options) {
-            filterOptionSection.append(createTag('span', { class: 'filter' }, option));
+        if (filter.type === 'dropdown') {
+            filterSection.append(createTag('span', { class: 'filter-list-item-category', 'data-filter': filter.id }, filter.name));
+            const filterOptionContainer = createTag('div', { class: 'filter-list-item-container' });
+            filterOptionContainer.append(createTag('span', { class: 'filter-list-item-selected' }), filter.selected);
+            const filterOptionSection = createTag('div', { class: 'filter-list-item-options', hidden: true });
+            for (let option of filter.options) {
+                filterOptionSection.append(createTag('span', { class: 'filter' }, option));
+            }
+            filterOptionContainer.append(filterOptionSection);
+            filterSection.append(filterOptionContainer);
+            filterSection.append(createTag('span', { class: 'filter-list-item-toggle' }));
         }
-        filterOptionContainer.append(filterOptionSection);
-        filterOptionContainer.append(createTag('span', { class: 'filter-list-item-toggle' }));
-        filterSection.append(filterOptionContainer);
+        else if (filter.type === 'searchbox') {
+            filterSection.append(createTag('input', { type: 'text-field', id: filter.id, placeholder: filter.name, class: 'filter-list-item-category', 'data-filter': filter.id }));
+        }
         parentSection.append(filterSection);
     }
     ele.append(parentSection);
 }
 
-function createSelect(fd) {
-    const select = document.createElement('select');
-    select.id = fd.Field;
-    select.addEventListener('change', hideShowFormFields);
-    if (fd.Placeholder) {
-        const ph = document.createElement('option');
-        ph.textContent = fd.Placeholder;
-        ph.setAttribute('selected', '');
-        ph.setAttribute('disabled', '');
-        select.append(ph);
+function createResultSection(ele) {
+    ele.append(createTag('h2', { class: 'search-results-count' }, `${searchResultData.length} ${searchResultStr}`));
+    const winnersSection = createTag('div', { class: 'search-result-winners' });
+    for (let data of searchResultData) {
+        const winnerSection = createTag('div', { class: 'card-block', 'data-valign': 'middle' });
+        const imageSrc = data[imageStr] ? data[imageStr] : '/profile/' + data[ldapStr] + pngStr;
+        const imageSection = createTag('object', { data: imageSrc, type: 'image/png' });
+        imageSection.append(createTag('img', { src: '/profile/default.png', alt: data[ldapStr] }));
+        winnerSection.append(createTag('div', { class: 'card-image' }, imageSection));
+        let details = createTag('div', { class: 'card-content' });
+        details.append(createTag('p', { class: 'body-xs' }, `${data[yearStr]} - ${data[quarterStr]}`));
+        details.append(createTag('h2', { class: 'heading-xs' }, data[awardStr]));
+        details.append(createTag('h2', { class: 'heading-xs' }, data[nameStr]));
+        winnerSection.append(details);
+        winnersSection.append(createTag('div', { class: 'card-horizontal' }, createTag('div', { class: 'foreground' }, winnerSection)));
     }
-    fd.Options.split(',').forEach((o) => {
-        const option = document.createElement('option');
-        option.textContent = o.trim();
-        option.value = o.trim();
-        select.append(option);
-    });
-    if (fd.Mandatory === 'x') {
-        select.setAttribute('required', 'required');
-    }
-    return select;
+    ele.append(winnersSection);
 }
+
+function getFilteredData(data, filterName) {
+    for (let filter of filterName) {
+        data = data.filter(function (entry) {
+            return entry[filter.value]?.toLowerCase() === filter.selected?.toLowerCase();
+        });
+    }
+    return data;
+}
+
 function getStringKeyName(str) {
     /*
     The [^...] character class is used to match any character that is not a valid CSS selector character.
@@ -65,7 +86,9 @@ async function fetchData(path, ele) {
     excelData = mergeArraysById(nominationJsonData.data, resultsJsonData.data);
     console.log('excelData', excelData);
     createFilterData();
+    searchResultData = getFilteredData(excelData, filterBy);
     createFilterSection(ele);
+    createResultSection(ele);
 }
 const mergeArraysById = (nominationArr = [], resultsArray = []) => {
     let res = [];
@@ -86,9 +109,13 @@ const createFilterData = () => {
         for (let filter of filterBy) {
             let filterSet = new Set();
             for (let data of excelData) {
-                filterSet.add(data[filter.value]);
+                filterSet.add(data[filter?.id]);
             }
-            filter.options = Array.from(filterSet);
+            if (!filter.options) {
+                filter.options = Array.from(filterSet);
+            }
+            filter.selected = filter.options[0];
+
         }
         console.log('filterByOptions', filterBy);
     }
@@ -108,16 +135,16 @@ const init = (block) => {
         const rows = sectionMetadata.querySelectorAll(':scope > div');
         rows.forEach((row) => {
             let filter = {};
-            const key = row.children[0].textContent;
-            let val = getStringKeyName(row.children[1].textContent);
-            filter.key = key;
-            filter.value = val;
+            filter.name = row.children[0].textContent;
+            filter.id = row.children[1].textContent;
+            filter.type = row.children[2].textContent;
+            let options = row.children[3].textContent;
+            if (options) {
+                filter.options = options.split(',');
+            }
             filterBy.push(filter);
         });
-        console.log('filterBy', filterBy);
-
         const searchAwards = rootElem.querySelector('.search-awards');
-
         if (!searchAwards) return;
         const rowsSearchAwards = searchAwards.querySelectorAll(':scope > div');
         rowsSearchAwards.forEach((row) => {
