@@ -1,3 +1,48 @@
+/* Top container CSS - START */
+
+.filter-list {
+  display: flex;
+  gap: 24px;
+
+}
+
+.filter-list-item-category {
+  font-size: 12px;
+  
+}
+/* .filter{
+  font-size: 14px;
+
+
+} */
+
+.filter-list-item-options, .filter-list-item-selected, .filter-list-item-container{
+  font-size: 14px;
+
+}
+
+.filter-list-item {
+  display: flex;
+  align-self: flex-start;
+  gap: 15px;
+}
+.filter-list-item-container{
+  background: #FAFAFA;
+  border:  1px solid #CACACA;
+  border-radius: 4px;
+  padding: 2px 10px;
+  width: 120px;
+}
+
+.filter-list-item-options{
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* Top container CSS - END */
+
+
 
 .card-horizontal {
     display: block;
