@@ -238,7 +238,7 @@ function showNominationStatus(records) {
     let nominationStartDate = excelDateToJSDate(record.startDate);
     if (CURRENT_DATE >= nominationStartDate && CURRENT_DATE < nominationEndDate) {
       var nominationInfo = document.createElement('p');
-      nominationInfo.textContent = 'Nomination is open' + ' for ' + record.category + ' till ' + nominationEndDate.toDateString();
+      nominationInfo.textContent = 'Nominations are open for ' + record.category + ' until ' + nominationEndDate.toDateString();
       nominationInfo.style.color = 'green';
 
     } else {
