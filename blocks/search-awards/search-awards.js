@@ -92,16 +92,17 @@ function getStringKeyName(str) {
     const regex = /[^\p{L}\p{N}_-]/gu;
     return str.trim().toLowerCase().replace(/\s+/g, '-').replace(regex, '');
 }
-async function fetchData(path) {
+async function fetchData(path, val) {
+    console.log("loading", new Date());
+    searchAwardsSection.querySelector('.filter-list')?.remove();
+    searchAwardsSection.querySelector('.search-results')?.remove();
     const nominationResponse = await fetch(path);
     const nominationJsonData = await nominationResponse.json();
     const resultsResponse = await fetch(`${path}?sheet=${resultsSheetStr}`);
     const resultsJsonData = await resultsResponse.json();
     excelData = mergeArraysById(nominationJsonData.data, resultsJsonData.data);
-    console.log('excelData', excelData);
-    searchAwardsSection.querySelector('.filter-list')?.remove();
-    searchAwardsSection.querySelector('.search-results')?.remove();
-    createFilterData();
+    console.log("loaded", new Date());
+    createFilterData(val);
     searchResultData = getFilteredData(excelData, filterBy);
     initFilters(createFilterSection(searchAwardsSection));
     createResultSection(searchAwardsSection);
@@ -117,26 +118,26 @@ function initFilters(elm) {
         option.addEventListener('click', changeFilters);
     });
 }
+
 function changeFilters(e) {
     const { target } = e;
     const id = target.getAttribute('data-filter-by');
     const t = searchAwardsSection.querySelector(`.filter-list-item-selected[data-filter-id=${id}]`);
-    console.log(t);
-
     t.textContent = target.textContent;
     t.click();
     updateFilter(id, target.textContent.trim());
-    console.log('filterByOptions', filterBy);
-    console.log('searchResultData', searchResultData);
 }
 function updateFilter(key, value) {
     for (let filter of filterBy) {
         if (filter.id === key) {
             filter.selected = value;
+            if (filter['datapath']) {
+                fetchData(filter['datapath'][value], value);
+                return;
+            }
             searchResultData = getFilteredData(excelData, filterBy);
             searchAwardsSection.querySelector('.search-results').remove();
             createResultSection(searchAwardsSection);
-            console.log("reload dom");
             return;
         }
     }
@@ -163,46 +164,55 @@ const mergeArraysById = (nominationArr = [], resultsArray = []) => {
     return res;
 };
 
-const createFilterData = () => {
-    if (excelData) {
-        for (let filter of filterBy) {
-            let filterSet = new Set();
-            for (let data of excelData) {
-                filterSet.add(data[filter?.id]);
-            }
-            if (!filter.options) {
-                filter.options = Array.from(filterSet);
-            }
-            if (filter.type !== 'textfield')
-                filter.selected = filter.options[0];
-
+const createFilterData = (category) => {
+    for (let filter of filterBy) {
+        let filterSet = new Set();
+        for (let data of excelData) {
+            filterSet.add(data[filter?.id]);
         }
-        console.log('filterByOptions', filterBy);
-    }
-    else {
-        setTimeout(() => {
-            createFilterData(key, val);
-        }, 100);
+        if (!filter.datapath) {
+            filter.options = Array.from(filterSet);
+            filter.selected = filter.options[0];
+        } else {
+            filter.selected = category;
+        }
     }
 };
 const init = (block) => {
     const rootElem = block.closest('.fragment') || document;
     const allSections = Array.from(rootElem.querySelectorAll('div.section'));
     allSections.forEach((e, i) => {
-
-        const sectionMetadata = e.querySelector(':scope > .section-metadata');
-        if (!sectionMetadata) return;
-        const rows = sectionMetadata.querySelectorAll(':scope > div');
-        rows.forEach((row) => {
-            let filter = {};
-            filter.name = row.children[0].textContent;
-            filter.id = row.children[1].textContent;
-            filter.type = row.children[2].textContent;
-            let options = row.children[3].textContent;
-            if (options) {
-                filter.options = options.split(',');
+        let categoryMap = {};
+        let categoryId;
+        const filterSectionMetadata = e.querySelectorAll(':scope > .section-metadata');
+        if (!filterSectionMetadata) return;
+        filterSectionMetadata.forEach((f) => {
+            const className = f.className.replace('section-metadata', '');
+            if (className.includes("filter")) {
+                const rows = f.querySelectorAll(':scope > div');
+                let filter = {};
+                rows.forEach((row) => {
+                    if (row.children[0].textContent === 'options') {
+                        filter[row.children[0].textContent] = row.children[1].textContent.split(',').map(o => o.trim());
+                    }
+                    else {
+                        filter[row.children[0].textContent] = row.children[1].textContent;
+                    }
+                });
+                filterBy.push(filter);
             }
-            filterBy.push(filter);
+            if (className.includes("id-")) {
+                categoryId = className.replace('id-', '').trim();
+                const rows = f.querySelectorAll(':scope > div');
+                rows.forEach((row) => {
+                    categoryMap[row.children[0].textContent.trim()] = row.children[1].textContent.trim();
+                });
+            }
+        });
+        filterBy.map((fb) => {
+            if (fb.id === categoryId) {
+                fb['datapath'] = categoryMap;
+            }
         });
         searchAwardsSection = rootElem.querySelector('.search-awards');
         if (!searchAwardsSection) return;
@@ -211,7 +221,7 @@ const init = (block) => {
             const key = getStringKeyName(row.children[0].textContent);
             if (key === 'path') {
                 let val = row.children[1].textContent;
-                fetchData(val);
+                fetchData(categoryMap[val], val);
                 row.remove();
             }
         });
