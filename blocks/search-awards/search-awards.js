@@ -56,7 +56,7 @@ const init = (block) => {
                 fb['datapath'] = categoryMap;
             }
         });
-        filterBy.push({ name: 'Status', id: 'status', type: 'hidden', selected: 'Winner' });
+        //filterBy.push({ name: 'Status', id: 'status', type: 'hidden', selected: 'Winner' });
         searchAwardsDOM = rootElem.querySelector('.search-awards');
         if (!searchAwardsDOM) return;
         const rowsSearchAwards = searchAwardsDOM.querySelectorAll(':scope > div');
@@ -69,7 +69,6 @@ const init = (block) => {
             }
         });
     });
-
 };
 
 async function fetchData(dataPath, selectedCategory) {
@@ -104,12 +103,11 @@ const mergeArraysById = (nominationArr = [], resultsArray = []) => {
 };
 
 const createFilterByOptions = (selectedValue) => {
-    console.log(incomingData);
     for (let filter of filterBy) {
         let filterSet = new Set();
         for (let data of incomingData) {
             if (data[filter?.id])
-                filterSet.add(data[filter?.id]);
+                filterSet.add(camelize(data[filter?.id].toLowerCase()));
         }
         if (!filter.datapath) {
             filter.options = Array.from(filterSet);
@@ -119,7 +117,6 @@ const createFilterByOptions = (selectedValue) => {
         }
     }
     console.log(filterBy);
-
 };
 
 function createFilterDOM(elm) {
@@ -184,6 +181,9 @@ function getStringKeyName(str) {
     const regex = /[^\p{L}\p{N}_-]/gu;
     return str.trim().toLowerCase().replace(/\s+/g, '-').replace(regex, '');
 }
+function camelize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
 
 function initFilters(elm) {
     const filters = elm.querySelectorAll('[role="filter"]');
@@ -225,6 +225,7 @@ function updateFilter(key, value) {
 function toggleFilter(e) {
     const { target } = e;
     const parent = target.parentNode;
+    parent.classList.toggle("active");
     parent.querySelectorAll('.filter-list-item-options')
         .forEach((t) => t.toggleAttribute('hidden'));
 
