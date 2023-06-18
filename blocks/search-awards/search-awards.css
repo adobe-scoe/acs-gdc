@@ -9,6 +9,17 @@
   flex-direction: column;
 }
 
+.search-awards .filter-list p {
+  color: #6E6E6E;
+}
+
+.search-awards .search-results p,
+.search-awards .search-results h2 {
+  color: #2C2C2C;
+}
+.search-awards .search-results h2.search-results-count {
+font-size: 22px;
+}
 .search-awards .search-results .search-result-winners {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -18,7 +29,7 @@
 
 .search-results .search-result-winners .card-horizontal .card-image object,
 .search-results .search-result-winners .card-horizontal .card-image img {
-  height: 100px;
+  height: 120px;
   width: 100px;
   border-radius: 4px 0 0 4px;
 }
@@ -29,6 +40,8 @@
   justify-content: space-between;
   row-gap: 24px;
   align-items: center;
+
+  
 }
 
 .search-awards .filter-list .filter-list-item {
@@ -40,6 +53,7 @@
 
 .search-awards .filter-list button {
   border: none;
+  color: #4B4B4B;
 }
 
 .search-awards .filter-list .filter-list-item .filter-list-item-category {
@@ -85,7 +99,7 @@
   background: none;
   width: 95%;
   text-align: left;
-  padding: 4px;
+  padding: 8px 4px;
 }
 
 .search-awards .filter-list .filter-list-item .filter-list-item-options:not([hidden]) {
@@ -104,7 +118,7 @@
   transform: scaleX(1.5);
   content: "\2228";
   transform: scaleX(1.5) scaleY(1.5) rotate(-90deg);
-  top: 5px;
+  top: 9px;
   position: absolute;
 }
 
@@ -130,6 +144,7 @@
     width: 50%;
   }
 }
+
 @media screen and (min-width: 768px) and (max-width: 1024px) {
   .search-awards .search-results .search-result-winners {
     grid-template-columns: 1fr 1fr;
@@ -238,7 +253,7 @@
 }
 
 .search-result-winners .card-horizontal .foreground .card-block .card-image {
-  height: 100px;
+  height: 120px;
   flex: 0 0 90px;
 }
 
