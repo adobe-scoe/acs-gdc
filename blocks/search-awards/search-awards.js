@@ -75,12 +75,15 @@ async function fetchData(dataPath, selectedCategory) {
     console.log("Data loading", new Date());
     searchAwardsDOM.querySelector('.filter-list')?.remove();
     searchAwardsDOM.querySelector('.search-results')?.remove();
+    toggleLoadingSection();
     const nominationResponse = await fetch(dataPath);
     const nominationJsonData = await nominationResponse.json();
     const resultsResponse = await fetch(`${dataPath}?sheet=${resultsSheetStr}`);
     const resultsJsonData = await resultsResponse.json();
     incomingData = mergeArraysById(nominationJsonData.data, resultsJsonData.data);
     console.log("Data loaded", new Date());
+   //return;
+    toggleLoadingSection();
     createFilterByOptions(selectedCategory);
     filteredData = getFilteredData(incomingData, filterBy);
     initFilters(createFilterDOM(searchAwardsDOM));
@@ -127,7 +130,9 @@ function createFilterDOM(elm) {
             filterSection = createTag('div', { class: 'filter-list-item' });
             filterSection.append(createTag('p', { class: 'filter-list-item-category' }, filter.name));
             const filterOptionContainer = createTag('div', { class: 'filter-list-item-container' });
-            filterOptionContainer.append(createTag('button', { class: 'filter-list-item-selected', role: 'filter', 'data-filter-id': filter.id }, filter.selected));
+            const selectedButton = createTag('button', { class: 'filter-list-item-selected', role: 'filter', 'data-filter-id': filter.id }, filter.selected);
+            selectedButton.append(createTag('img', { class: 'chevron-icon', src: '/blocks/search-awards/chevron.svg', width: '10', height: '10' }));
+            filterOptionContainer.append(selectedButton);
             const filterOptionSection = createTag('div', { class: 'filter-list-item-options', hidden: true });
             for (let option of filter.options) {
                 filterOptionSection.append(createTag('button', { class: 'filter', role: 'filter-options', 'data-filter-by': filter.id }, option));
@@ -139,6 +144,17 @@ function createFilterDOM(elm) {
     }
     elm.append(parentSection);
     return parentSection;
+}
+function createLoadingFilterDOM(elm) {
+    const parentSection = createTag('div', { class: 'filter-list loading' });
+    let filterSection = createTag('div', { class: 'filter-list-item' });
+    filterSection.append(createTag('div', { class: 'filter-list-item-category' }));
+    filterSection.append(createTag('div', { class: 'filter-list-item-container' }));
+    parentSection.append(filterSection);
+    parentSection.append(filterSection.cloneNode(true));
+    parentSection.append(filterSection.cloneNode(true));
+    parentSection.append(filterSection.cloneNode(true));
+    elm.append(parentSection);
 }
 
 function createResultDOM(elm) {
@@ -162,6 +178,45 @@ function createResultDOM(elm) {
     elm.append(resultsSection);
 }
 
+function createLoadingResultDOM(elm) {
+    const resultsSection = createTag('div', { class: 'search-results loading' });
+    resultsSection.append(createTag('div', { class: 'search-results-count' }));
+    const winnersSection = createTag('div', { class: 'search-result-winners' });
+    const winnerSection = createTag('div', { class: 'card-block', 'data-valign': 'middle' });
+    winnerSection.append(createTag('div', { class: 'card-image' }));
+    let details = createTag('div', { class: 'card-content' });
+    details.append(createTag('p', { class: 'body-xs' }));
+    details.append(createTag('h2', { class: 'heading-xs' }));
+    details.append(createTag('h2', { class: 'heading-xs' }));
+    winnerSection.append(details);
+    const cardSection = createTag('div', { class: 'card-horizontal' });
+    cardSection.append(createTag('div', { class: 'foreground' }, winnerSection));
+    winnersSection.append(cardSection);
+    winnersSection.append(cardSection.cloneNode(true));
+    winnersSection.append(cardSection.cloneNode(true));
+    winnersSection.append(cardSection.cloneNode(true));
+    winnersSection.append(cardSection.cloneNode(true));
+    winnersSection.append(cardSection.cloneNode(true));
+    winnersSection.append(cardSection.cloneNode(true));
+    winnersSection.append(cardSection.cloneNode(true));
+    winnersSection.append(cardSection.cloneNode(true));
+    resultsSection.append(winnersSection);
+    elm.append(resultsSection);
+}
+
+const toggleLoadingSection = () => {
+    const loadingSection = searchAwardsDOM.querySelectorAll(':scope > .loading');
+    if (loadingSection.length) {
+        loadingSection.forEach((row) => {
+            row.remove();
+        });
+    }
+    else {
+        createLoadingFilterDOM(searchAwardsDOM);
+        createLoadingResultDOM(searchAwardsDOM);
+    }
+}
+
 function getFilteredData(data, filterName) {
     for (let filter of filterName) {
         if (filter.selected) {
@@ -183,7 +238,7 @@ function getStringKeyName(str) {
 }
 function camelize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
-  }
+}
 
 function initFilters(elm) {
     const filters = elm.querySelectorAll('[role="filter"]');

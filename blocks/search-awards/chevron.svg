@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8">
+  <g id="Chevron" transform="translate(-253 -46)">
+    <rect id="Frame" width="12" height="8" transform="translate(253 46)" fill="#464646" opacity="0"/>
+    <path id="Shape" d="M11.99,1.51A1,1,0,0,0,10.283.8L6,5.086,1.717.8A1,1,0,1,0,.3,2.217l4.99,4.99a1,1,0,0,0,1.414,0l4.99-4.99A1,1,0,0,0,11.99,1.51Z" transform="translate(253 46)" fill="#464646"/>
+  </g>
+</svg>
