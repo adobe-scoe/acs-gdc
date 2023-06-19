@@ -293,6 +293,7 @@ function changeFilters(e) {
 function updateFilter(key, value) {
     for (let filter of filterBy) {
         if (filter.id === key) {
+            resultCount = initialCountToShow;
             filter.selected = value;
             if (filter['datapath']) {
                 fetchData(filter['datapath'][value], value);
@@ -300,7 +301,6 @@ function updateFilter(key, value) {
             }
             filteredData = getFilteredData(incomingData, filterBy);
             searchAwardsDOM.querySelector('.search-results').remove();
-            resultCount = initialCountToShow;
             initLoadMore(createResultDOM(searchAwardsDOM));
             return;
         }
