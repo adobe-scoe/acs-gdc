@@ -133,15 +133,18 @@
   padding: 12px;
   margin: 12px;
   background: #FAFAFA;
-  border: 1px solid #CACACA;
+  border: 1px solid #4B4B4B;
   border-radius: 4px;
   line-height: 1;
   font-size: 14px;
   font-weight: 700;
   color: #4B4B4B;
+  border-radius: 20px;
 }
 .search-awards .search-results .search-results-load-more button:disabled {
-  color: #b8b6b6;
+  color: #909090;
+  border: 1px solid #909090;
+
 }
 
 @media screen and (max-width: 767px) {

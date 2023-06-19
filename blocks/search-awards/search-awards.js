@@ -14,6 +14,7 @@ const nameStr = "empName";
 const awardStr = "award";
 const searchResultStr = "Search Results";
 const allStr = "All";
+const loadMoreStr = "Load more results"
 
 let incomingData;
 let filteredData;
@@ -88,7 +89,6 @@ async function fetchData(dataPath, selectedCategory) {
     const resultsJsonData = await resultsResponse.json();
     incomingData = mergeArraysById(nominationJsonData.data, resultsJsonData.data);
     console.log("Data loaded", new Date());
-    //return;
     toggleLoadingSection();
     createFilterByOptions(selectedCategory);
     filteredData = getFilteredData(incomingData, filterBy);
@@ -172,7 +172,7 @@ function createResultDOM(elm) {
         resultsSection.append(createLoadMoreResultsDOM(0, initialCountToShow));
         const loadMoreSection = createTag('div', { class: 'search-results-load-more' });
         loadMoreSection.append(createTag('p', { class: 'load-more-text' }, `Displaying ${initialCountToShow} out of ${filteredData.length}`));
-        loadMoreSection.append(createTag('button', { class: 'load-more-button', role: 'load' }, "Load More Results"));
+        loadMoreSection.append(createTag('button', { class: 'load-more-button', role: 'load' }, loadMoreStr));
         resultsSection.append(loadMoreSection);
     }
     else {
@@ -203,7 +203,7 @@ function createLoadMoreResultsDOM(i, j) {
 function createLoadingResultDOM(elm) {
     const resultsSection = createTag('div', { class: 'search-results loading' });
     resultsSection.append(createTag('h2', { class: 'search-results-count' }));
-    const winnersSection = createTag('div', { class: 'search-result-winners' });
+    const winnersSection = createTag('div', { class: 'search-results-winners' });
     const winnerSection = createTag('div', { class: 'card-block', 'data-valign': 'middle' });
     winnerSection.append(createTag('div', { class: 'card-image' }));
     let details = createTag('div', { class: 'card-content' });
