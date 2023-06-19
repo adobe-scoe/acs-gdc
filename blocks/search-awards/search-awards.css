@@ -127,14 +127,23 @@
 .search-awards .search-results .search-results-load-more .load-more-text {
   margin: 4px 0;
 }
-
+.search-awards .search-results.loading .search-results-load-more .load-more-text {
+  width:200px;
+  height:27px;
+}
+.search-awards .search-results.loading .search-results-load-more .load-more-button {
+  width:150px;
+  height:15px;
+  border-radius: 20px;
+  padding: 12px;
+  margin: 12px;
+}
 .search-awards .search-results .search-results-load-more button {
   text-align: center;
   padding: 12px;
   margin: 12px;
   background: #FAFAFA;
   border: 1px solid #4B4B4B;
-  border-radius: 4px;
   line-height: 1;
   font-size: 14px;
   font-weight: 700;
@@ -181,7 +190,9 @@
 .search-awards .loading .search-results-winners .card-horizontal .foreground .card-block .card-content,
 .search-awards .filter-list.loading .filter-list-item .filter-list-item-container,
 .search-awards .filter-list.loading .filter-list-item .filter-list-item-category,
-.search-awards .search-results.loading .search-results-count {
+.search-awards .search-results.loading .search-results-count,
+.search-awards .search-results.loading .search-results-load-more .load-more-button,
+.search-awards .search-results.loading .search-results-load-more .load-more-text {
   background: #f6f7f8;
   background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
   background-repeat: no-repeat;

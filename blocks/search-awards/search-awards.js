@@ -219,10 +219,13 @@ function createLoadingResultDOM(elm) {
     winnersSection.append(cardSection.cloneNode(true));
     winnersSection.append(cardSection.cloneNode(true));
     winnersSection.append(cardSection.cloneNode(true));
-    winnersSection.append(cardSection.cloneNode(true));
-    winnersSection.append(cardSection.cloneNode(true));
-    winnersSection.append(cardSection.cloneNode(true));
     resultsSection.append(winnersSection);
+    const loadMoreSection = createTag('div', { class: 'search-results-load-more' });
+    loadMoreSection.append(createTag('div', { class: 'load-more-text' }));
+    loadMoreSection.append(createTag('div', { class: 'load-more-button'}));
+
+    resultsSection.append(loadMoreSection);
+
     elm.append(resultsSection);
 }
 
