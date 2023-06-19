@@ -110,7 +110,7 @@
 }
 
 .search-awards .filter-list .filter-list-item .filter-list-item-container.active button.filter-list-item-selected img {
- transform: rotate(180deg);
+  transform: rotate(180deg);
 }
 
 .search-awards .filter-list .filter-list-item .filter-list-item-options:not([hidden]) {
@@ -130,9 +130,10 @@
   .search-awards .filter-list .filter-list-item .filter-list-item-container {
     width: 100%;
   }
-.search-awards .filter-list .filter-list-item .filter-list-item-container button {
-padding: 4px;
-}
+
+  .search-awards .filter-list .filter-list-item .filter-list-item-container button {
+    padding: 4px;
+  }
 }
 
 @media screen and (min-width: 768px) and (max-width: 1024px) {
