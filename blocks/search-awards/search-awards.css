@@ -62,7 +62,7 @@
   margin: 0;
 }
 
-.search-awards .filter-list .filter-list-item .filter-list-item-options,
+.search-awards .filter-list .filter-list-item .filter-list-item-options button,
 .search-awards .filter-list .filter-list-item .filter-list-item-selected,
 .search-awards .filter-list .filter-list-item .filter-list-item-container {
   font-size: 14px;
@@ -132,6 +132,12 @@
 
   .search-awards .filter-list .filter-list-item .filter-list-item-container button {
     padding: 4px;
+  }
+
+  .search-awards .filter-list .filter-list-item .filter-list-item-options button,
+  .search-awards .filter-list .filter-list-item .filter-list-item-selected,
+  .search-awards .filter-list .filter-list-item .filter-list-item-container {
+    font-size: 12px;
   }
 }
 
