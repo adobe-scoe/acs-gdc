@@ -82,7 +82,7 @@ async function fetchData(dataPath, selectedCategory) {
     const resultsJsonData = await resultsResponse.json();
     incomingData = mergeArraysById(nominationJsonData.data, resultsJsonData.data);
     console.log("Data loaded", new Date());
-   //return;
+    //return;
     toggleLoadingSection();
     createFilterByOptions(selectedCategory);
     filteredData = getFilteredData(incomingData, filterBy);
@@ -130,7 +130,8 @@ function createFilterDOM(elm) {
             filterSection = createTag('div', { class: 'filter-list-item' });
             filterSection.append(createTag('p', { class: 'filter-list-item-category' }, filter.name));
             const filterOptionContainer = createTag('div', { class: 'filter-list-item-container' });
-            const selectedButton = createTag('button', { class: 'filter-list-item-selected', role: 'filter', 'data-filter-id': filter.id }, filter.selected);
+            const selectedButton = createTag('button', { class: 'filter-list-item-selected', role: 'filter', 'data-filter-id': filter.id });
+            selectedButton.append(createTag('span', { class: 'selected-text'},filter.selected));
             selectedButton.append(createTag('img', { class: 'chevron-icon', src: '/blocks/search-awards/chevron.svg', width: '10', height: '10' }));
             filterOptionContainer.append(selectedButton);
             const filterOptionSection = createTag('div', { class: 'filter-list-item-options', hidden: true });
@@ -180,7 +181,7 @@ function createResultDOM(elm) {
 
 function createLoadingResultDOM(elm) {
     const resultsSection = createTag('div', { class: 'search-results loading' });
-    resultsSection.append(createTag('div', { class: 'search-results-count' }));
+    resultsSection.append(createTag('h2', { class: 'search-results-count' }));
     const winnersSection = createTag('div', { class: 'search-result-winners' });
     const winnerSection = createTag('div', { class: 'card-block', 'data-valign': 'middle' });
     winnerSection.append(createTag('div', { class: 'card-image' }));
@@ -256,7 +257,7 @@ function changeFilters(e) {
     const { target } = e;
     const id = target.getAttribute('data-filter-by');
     const t = searchAwardsDOM.querySelector(`.filter-list-item-selected[data-filter-id=${id}]`);
-    t.textContent = target.textContent;
+    t.querySelector(`.selected-text`).textContent = target.textContent;
     t.click();
     updateFilter(id, target.textContent.trim());
 }
@@ -279,7 +280,7 @@ function updateFilter(key, value) {
 
 function toggleFilter(e) {
     const { target } = e;
-    const parent = target.parentNode;
+    const parent = target.closest('.filter-list-item-container');
     parent.classList.toggle("active");
     parent.querySelectorAll('.filter-list-item-options')
         .forEach((t) => t.toggleAttribute('hidden'));

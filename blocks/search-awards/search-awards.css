@@ -77,7 +77,7 @@
   line-height: 1;
   z-index: 1;
   width: 100%;
-  left: -0.5px;
+  left: -1px;
   border-radius: 0 0 4px 4px;
 }
 
@@ -97,7 +97,7 @@
 
 .search-awards .filter-list .filter-list-item .filter-list-item-container button {
   background: none;
-  width: 95%;
+  width: 100%;
   text-align: left;
   padding: 8px;
   display: flex;
@@ -107,6 +107,10 @@
 
 .search-awards .filter-list .filter-list-item .filter-list-item-container button.filter-list-item-selected img {
   margin-left: 8px;
+}
+
+.search-awards .filter-list .filter-list-item .filter-list-item-container.active button.filter-list-item-selected img {
+ transform: rotate(180deg);
 }
 
 .search-awards .filter-list .filter-list-item .filter-list-item-options:not([hidden]) {
@@ -172,21 +176,28 @@
 
 .search-awards .loading .search-result-winners .card-horizontal .foreground .card-block .card-image {
   background: #e4e5e6bb;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 4px;
 }
 
 .search-awards .loading .search-result-winners .card-horizontal .foreground .card-block .card-content {
   height: 130px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 0;
 }
 
 .search-awards .filter-list.loading .filter-list-item .filter-list-item-category {
-  width: 45px;
+  width: 60px;
   height: 18px;
 }
 
 .search-awards .search-results.loading .search-results-count {
   width: 40%;
-  height: 30px;
-  margin: 18px 0;
+  height: 35px;
 }
 
 /* Top container CSS - END */
