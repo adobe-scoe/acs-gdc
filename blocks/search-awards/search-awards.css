@@ -22,15 +22,15 @@
   font-size: 22px;
 }
 
-.search-awards .search-results .search-result-winners {
+.search-awards .search-results .search-results-winners {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   column-gap: 24px;
   row-gap: 24px;
 }
 
-.search-results .search-result-winners .card-horizontal .card-image object,
-.search-results .search-result-winners .card-horizontal .card-image img {
+.search-results .search-results-winners .card-horizontal .card-image object,
+.search-results .search-results-winners .card-horizontal .card-image img {
   height: 130px;
   width: 113px;
   border-radius: 4px 0 0 4px;
@@ -117,12 +117,39 @@
   flex-direction: column;
 }
 
+.search-awards .search-results .search-results-load-more {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 24px 0;
+}
+
+.search-awards .search-results .search-results-load-more .load-more-text {
+  margin: 4px 0;
+}
+
+.search-awards .search-results .search-results-load-more button {
+  text-align: center;
+  padding: 12px;
+  margin: 12px;
+  background: #FAFAFA;
+  border: 1px solid #CACACA;
+  border-radius: 4px;
+  line-height: 1;
+  font-size: 14px;
+  font-weight: 700;
+  color: #4B4B4B;
+}
+.search-awards .search-results .search-results-load-more button:disabled {
+  color: #b8b6b6;
+}
+
 @media screen and (max-width: 767px) {
   .search-awards .filter-list .filter-list-item {
     width: calc(50% - 8px);
   }
 
-  .search-awards .search-results .search-result-winners {
+  .search-awards .search-results .search-results-winners {
     grid-template-columns: 1fr;
   }
 
@@ -142,13 +169,13 @@
 }
 
 @media screen and (min-width: 768px) and (max-width: 1024px) {
-  .search-awards .search-results .search-result-winners {
+  .search-awards .search-results .search-results-winners {
     grid-template-columns: 1fr 1fr;
   }
 }
 
-.search-awards .loading .search-result-winners .card-horizontal .foreground .card-block .card-image,
-.search-awards .loading .search-result-winners .card-horizontal .foreground .card-block .card-content,
+.search-awards .loading .search-results-winners .card-horizontal .foreground .card-block .card-image,
+.search-awards .loading .search-results-winners .card-horizontal .foreground .card-block .card-content,
 .search-awards .filter-list.loading .filter-list-item .filter-list-item-container,
 .search-awards .filter-list.loading .filter-list-item .filter-list-item-category,
 .search-awards .search-results.loading .search-results-count {
@@ -174,12 +201,12 @@
   border: none;
 }
 
-.search-awards .loading .search-result-winners .card-horizontal .foreground .card-block {
+.search-awards .loading .search-results-winners .card-horizontal .foreground .card-block {
   gap: 0;
   border: none;
 }
 
-.search-awards .loading .search-result-winners .card-horizontal .foreground .card-block .card-image {
+.search-awards .loading .search-results-winners .card-horizontal .foreground .card-block .card-image {
   background: #e4e5e6bb;
   border-top-left-radius: 4px;
   border-top-right-radius: 0;
@@ -187,7 +214,7 @@
   border-bottom-left-radius: 4px;
 }
 
-.search-awards .loading .search-result-winners .card-horizontal .foreground .card-block .card-content {
+.search-awards .loading .search-results-winners .card-horizontal .foreground .card-block .card-content {
   height: 130px;
   border-top-left-radius: 0;
   border-top-right-radius: 4px;
@@ -269,7 +296,7 @@
   margin: 0;
 }
 
-.search-result-winners .card-horizontal .foreground .card-block {
+.search-results-winners .card-horizontal .foreground .card-block {
   position: relative;
   display: flex;
   flex-direction: row;
@@ -295,7 +322,7 @@
   transition: box-shadow .3s ease-in-out;
 }
 
-.search-result-winners .card-horizontal .foreground .card-block .card-content {
+.search-results-winners .card-horizontal .foreground .card-block .card-content {
   padding-right: var(--spacing-s);
   margin: 0;
   /* stylelint-disable-next-line value-no-vendor-prefix */
@@ -306,7 +333,7 @@
   flex-grow: 1;
 }
 
-.search-result-winners .card-horizontal .foreground .card-block .card-image {
+.search-results-winners .card-horizontal .foreground .card-block .card-image {
   height: 130px;
   flex: 0 0 100px;
 }

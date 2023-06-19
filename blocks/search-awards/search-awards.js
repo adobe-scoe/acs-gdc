@@ -13,11 +13,17 @@ const quarterStr = "quarter";
 const nameStr = "empName";
 const awardStr = "award";
 const searchResultStr = "Search Results";
+const allStr = "All";
 
 let incomingData;
 let filteredData;
 let filterBy = [];
 let searchAwardsDOM;
+let winnersSectionDOM;
+const initialCountToShow = 3;
+const incrementalCountToShow = 3;
+let resultCount = initialCountToShow;
+
 
 const init = (block) => {
     const rootElem = block.closest('.fragment') || document;
@@ -56,7 +62,7 @@ const init = (block) => {
                 fb['datapath'] = categoryMap;
             }
         });
-        //filterBy.push({ name: 'Status', id: 'status', type: 'hidden', selected: 'Winner' });
+        filterBy.push({ name: 'Status', id: 'status', type: 'hidden', selected: 'Winner' });
         searchAwardsDOM = rootElem.querySelector('.search-awards');
         if (!searchAwardsDOM) return;
         const rowsSearchAwards = searchAwardsDOM.querySelectorAll(':scope > div');
@@ -87,7 +93,7 @@ async function fetchData(dataPath, selectedCategory) {
     createFilterByOptions(selectedCategory);
     filteredData = getFilteredData(incomingData, filterBy);
     initFilters(createFilterDOM(searchAwardsDOM));
-    createResultDOM(searchAwardsDOM);
+    initLoadMore(createResultDOM(searchAwardsDOM));
     console.log("DOM loaded", new Date());
 }
 
@@ -108,6 +114,7 @@ const mergeArraysById = (nominationArr = [], resultsArray = []) => {
 const createFilterByOptions = (selectedValue) => {
     for (let filter of filterBy) {
         let filterSet = new Set();
+        filterSet.add(allStr);
         for (let data of incomingData) {
             if (data[filter?.id])
                 filterSet.add(camelize(data[filter?.id].toLowerCase()));
@@ -119,7 +126,6 @@ const createFilterByOptions = (selectedValue) => {
             filter.selected = selectedValue;
         }
     }
-    console.log(filterBy);
 };
 
 function createFilterDOM(elm) {
@@ -131,7 +137,7 @@ function createFilterDOM(elm) {
             filterSection.append(createTag('p', { class: 'filter-list-item-category' }, filter.name));
             const filterOptionContainer = createTag('div', { class: 'filter-list-item-container' });
             const selectedButton = createTag('button', { class: 'filter-list-item-selected', role: 'filter', 'data-filter-id': filter.id });
-            selectedButton.append(createTag('span', { class: 'selected-text'},filter.selected));
+            selectedButton.append(createTag('span', { class: 'selected-text' }, filter.selected));
             selectedButton.append(createTag('img', { class: 'chevron-icon', src: '/blocks/search-awards/chevron.svg', width: '10', height: '10' }));
             filterOptionContainer.append(selectedButton);
             const filterOptionSection = createTag('div', { class: 'filter-list-item-options', hidden: true });
@@ -161,24 +167,39 @@ function createLoadingFilterDOM(elm) {
 function createResultDOM(elm) {
     const resultsSection = createTag('div', { class: 'search-results' });
     resultsSection.append(createTag('h2', { class: 'search-results-count' }, `${filteredData.length} ${searchResultStr}`));
-    const winnersSection = createTag('div', { class: 'search-result-winners' });
-    for (let data of filteredData) {
-        const winnerSection = createTag('div', { class: 'card-block', 'data-valign': 'middle' });
-        const imageSrc = data[imageStr] ? data[imageStr] : '/profile/' + data[ldapStr] + pngStr;
-        const imageSection = createTag('object', { data: imageSrc, type: 'image/png' });
-        imageSection.append(createTag('img', { src: '/profile/default.png', alt: data[ldapStr] }));
-        winnerSection.append(createTag('div', { class: 'card-image' }, imageSection));
-        let details = createTag('div', { class: 'card-content' });
-        details.append(createTag('p', { class: 'body-xs' }, `${data[yearStr]} - ${data[quarterStr]}`));
-        details.append(createTag('h2', { class: 'heading-xs' }, data[awardStr]));
-        details.append(createTag('h2', { class: 'heading-xs' }, data[nameStr]));
-        winnerSection.append(details);
-        winnersSection.append(createTag('div', { class: 'card-horizontal' }, createTag('div', { class: 'foreground' }, winnerSection)));
+    winnersSectionDOM = createTag('div', { class: 'search-results-winners' });
+    if (filteredData.length > initialCountToShow) {
+        resultsSection.append(createLoadMoreResultsDOM(0, initialCountToShow));
+        const loadMoreSection = createTag('div', { class: 'search-results-load-more' });
+        loadMoreSection.append(createTag('p', { class: 'load-more-text' }, `Displaying ${initialCountToShow} out of ${filteredData.length}`));
+        loadMoreSection.append(createTag('button', { class: 'load-more-button', role: 'load' }, "Load More Results"));
+        resultsSection.append(loadMoreSection);
     }
-    resultsSection.append(winnersSection);
+    else {
+        resultsSection.append(createLoadMoreResultsDOM(0, filteredData.length));
+    }
     elm.append(resultsSection);
+    return resultsSection;
 }
 
+function createLoadMoreResultsDOM(i, j) {
+    for (const [index, data] of filteredData.entries()) {
+        if (i <= index && index < j) {
+            const winnerSection = createTag('div', { class: 'card-block', 'data-valign': 'middle' });
+            const imageSrc = data[imageStr] ? data[imageStr] : '/profile/' + data[ldapStr] + pngStr;
+            const imageSection = createTag('object', { data: imageSrc, type: 'image/png' });
+            imageSection.append(createTag('img', { src: '/profile/default.png', alt: data[ldapStr] }));
+            winnerSection.append(createTag('div', { class: 'card-image' }, imageSection));
+            let details = createTag('div', { class: 'card-content' });
+            details.append(createTag('p', { class: 'body-xs' }, `${data[yearStr]} - ${data[quarterStr]}`));
+            details.append(createTag('h2', { class: 'heading-xs' }, data[awardStr]));
+            details.append(createTag('h2', { class: 'heading-xs' }, data[nameStr]));
+            winnerSection.append(details);
+            winnersSectionDOM.append(createTag('div', { class: 'card-horizontal' }, createTag('div', { class: 'foreground' }, winnerSection)));
+        }
+    }
+    return winnersSectionDOM;
+}
 function createLoadingResultDOM(elm) {
     const resultsSection = createTag('div', { class: 'search-results loading' });
     resultsSection.append(createTag('h2', { class: 'search-results-count' }));
@@ -220,7 +241,7 @@ const toggleLoadingSection = () => {
 
 function getFilteredData(data, filterName) {
     for (let filter of filterName) {
-        if (filter.selected) {
+        if (filter.selected && filter.selected !== allStr) {
             data = data.filter(function (entry) {
                 return filter?.selected?.toLowerCase() === entry[filter.id]?.toLowerCase();
             });
@@ -253,6 +274,13 @@ function initFilters(elm) {
     });
 }
 
+function initLoadMore(elm) {
+    const loadMore = elm.querySelectorAll('[role="load"]');
+    loadMore.forEach((load) => {
+        load.addEventListener('click', loadMoreResults);
+    });
+}
+
 function changeFilters(e) {
     const { target } = e;
     const id = target.getAttribute('data-filter-by');
@@ -272,7 +300,8 @@ function updateFilter(key, value) {
             }
             filteredData = getFilteredData(incomingData, filterBy);
             searchAwardsDOM.querySelector('.search-results').remove();
-            createResultDOM(searchAwardsDOM);
+            resultCount = initialCountToShow;
+            initLoadMore(createResultDOM(searchAwardsDOM));
             return;
         }
     }
@@ -284,6 +313,20 @@ function toggleFilter(e) {
     parent.classList.toggle("active");
     parent.querySelectorAll('.filter-list-item-options')
         .forEach((t) => t.toggleAttribute('hidden'));
+
+}
+
+function loadMoreResults() {
+    if (filteredData.length > resultCount) {
+        searchAwardsDOM.querySelector('.load-more-button').removeAttribute('disabled');
+        createLoadMoreResultsDOM(resultCount, resultCount + incrementalCountToShow);
+        resultCount += incrementalCountToShow;
+        resultCount = resultCount > filteredData.length ? filteredData.length : resultCount;
+    }
+    searchAwardsDOM.querySelector('.search-results-load-more p.load-more-text').textContent = `Displaying ${resultCount} out of ${filteredData.length}`;
+    if (resultCount === filteredData.length) {
+        searchAwardsDOM.querySelector('.load-more-button').setAttribute('disabled', true);
+    }
 
 }
 
