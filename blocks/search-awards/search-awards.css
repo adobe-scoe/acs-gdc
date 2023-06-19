@@ -123,17 +123,16 @@
     width: calc(50% - 8px);
   }
 
-  .search-awards {
-    margin: 5rem 0.5rem;
-  }
-
   .search-awards .search-results .search-result-winners {
     grid-template-columns: 1fr;
   }
 
   .search-awards .filter-list .filter-list-item .filter-list-item-container {
-    width: 50%;
+    width: 100%;
   }
+.search-awards .filter-list .filter-list-item .filter-list-item-container button {
+padding: 4px;
+}
 }
 
 @media screen and (min-width: 768px) and (max-width: 1024px) {
