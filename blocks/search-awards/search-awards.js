@@ -140,7 +140,7 @@ function createFilterDOM(elm) {
             selectedButton.append(createTag('span', { class: 'selected-text' }, filter.selected));
             selectedButton.append(createTag('img', { class: 'chevron-icon', src: '/blocks/search-awards/chevron.svg', width: '10', height: '10' }));
             filterOptionContainer.append(selectedButton);
-            const filterOptionSection = createTag('div', { class: 'filter-list-item-options', hidden: true });
+            const filterOptionSection = createTag('div', { class: 'filter-list-item-options' });
             for (let option of filter.options) {
                 filterOptionSection.append(createTag('button', { class: 'filter', role: 'filter-options', 'data-filter-by': filter.id }, option));
             }
@@ -222,7 +222,7 @@ function createLoadingResultDOM(elm) {
     resultsSection.append(winnersSection);
     const loadMoreSection = createTag('div', { class: 'search-results-load-more' });
     loadMoreSection.append(createTag('div', { class: 'load-more-text' }));
-    loadMoreSection.append(createTag('div', { class: 'load-more-button'}));
+    loadMoreSection.append(createTag('div', { class: 'load-more-button' }));
 
     resultsSection.append(loadMoreSection);
 
@@ -313,10 +313,13 @@ function updateFilter(key, value) {
 function toggleFilter(e) {
     const { target } = e;
     const parent = target.closest('.filter-list-item-container');
+    searchAwardsDOM.querySelectorAll('.filter-list-item-container')
+        .forEach((t) => {
+            if (parent !== t) {
+                t.classList.remove('active');
+            }
+        });
     parent.classList.toggle("active");
-    parent.querySelectorAll('.filter-list-item-options')
-        .forEach((t) => t.toggleAttribute('hidden'));
-
 }
 
 function loadMoreResults() {
