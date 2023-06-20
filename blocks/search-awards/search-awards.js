@@ -79,7 +79,7 @@ const init = (block) => {
 };
 
 async function fetchData(dataPath, selectedCategory) {
-    console.log("Data loading", new Date());
+    const startDate = new Date().getTime();
     searchAwardsDOM.querySelector('.filter-list')?.remove();
     searchAwardsDOM.querySelector('.search-results')?.remove();
     toggleLoadingSection();
@@ -88,13 +88,14 @@ async function fetchData(dataPath, selectedCategory) {
     const resultsResponse = await fetch(`${dataPath}?sheet=${resultsSheetStr}`);
     const resultsJsonData = await resultsResponse.json();
     incomingData = mergeArraysById(nominationJsonData.data, resultsJsonData.data);
-    console.log("Data loaded", new Date());
+    const endDate = new Date().getTime();
+    console.log("Data loaded in ", (endDate - startDate)/1000, 'sec');
     toggleLoadingSection();
     createFilterByOptions(selectedCategory);
     filteredData = getFilteredData(incomingData, filterBy);
     initFilters(createFilterDOM(searchAwardsDOM));
     initLoadMore(createResultDOM(searchAwardsDOM));
-    console.log("DOM loaded", new Date());
+    console.log("DOM loaded in ", (new Date().getTime() - endDate)/1000, 'sec');
 }
 
 const mergeArraysById = (nominationArr = [], resultsArray = []) => {
