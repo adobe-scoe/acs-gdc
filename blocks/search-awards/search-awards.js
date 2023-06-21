@@ -1,4 +1,3 @@
-
 import { getLibs } from '../../scripts/utils.js';
 
 const { createTag } = await import(`${getLibs()}/utils/utils.js`);
@@ -12,7 +11,7 @@ const yearStr = "year";
 const quarterStr = "quarter";
 const nameStr = "empName";
 const awardStr = "award";
-const searchResultStr = "Search Results";
+const searchResultStr = "Search results";
 const allStr = "All";
 const loadMoreStr = "Load more results"
 
