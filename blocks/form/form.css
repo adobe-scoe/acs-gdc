@@ -2,7 +2,7 @@ main .form {
     background-color: white;
     padding: var(--spacing-m);
     box-shadow: 0 1px 6px rgb(34 34 34 / 10%);
-    max-width: 800px;
+    max-width: 600px;
     margin: 0 auto;
 
 }
@@ -51,6 +51,7 @@ main .form label {
     text-transform: uppercase;
     box-sizing: border-box;
     font-weight: 800;
+    align-self:center;
 }
 
 main .form label.required::after {

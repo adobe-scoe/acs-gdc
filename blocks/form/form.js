@@ -2,6 +2,10 @@ const FUNCTIONAL = 'Functional';
 const CURRENT_DATE = new Date(); // Get current date
 const CURRENT_DATA_TIME_MILLISECONDS = Date.now();
 
+let pwdMap = {}
+function initPwdMap(n) { n["Functional AEM Competency"] = "cW40ZXhtdG94NA==", n["Functional APAC Delivery"] = "M3Y3MGh1cXhpMw==", n["Functional CJM"] = "NDR4Z3MxNzVuaA==", n["Functional Commerce & PT"] = "bDdyeWNqbzEzYQ==", n["Functional Data"] = "cGI0Y3I4dWFndg==", n["Functional EA MSA SCOE & Workfront"] = "a3FiaDNhZDNsdA==", n["Functional SA UX Business Consulting"] = "djN0MW5xaDd2dw==", n["Functional UI Ultimate Support Sign"] = "aWVjdXMycW1zeQ==", n["Functional APAC Delivery"] = "dWI2enoxbjFkYw==", n["Functional EMEA Delivery"] = "cjB1czgxNGVzZA==", n["Functional NA Delivery"] = "bnJjdHprd2I5MQ==", n["Functional QA & Japan Delivery"] = "YnFxa3BmMXNlaw==", n["Functional RMO & Operations"] = "ZWd0NXdqZWNkdw==", n.AHM = "dG9lOGZ5eGY5YQ==" }
+
+
 function createSelect(fd) {
   const select = document.createElement('select');
   select.id = fd.Field;
@@ -37,6 +41,16 @@ function constructPayload(form) {
   return payload;
 }
 
+function authorized(form) {
+  const payload = constructPayload(form);
+  let category = payload.category;
+  if (pwdMap[category] === btoa(payload.password)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 async function submitForm(form) {
   const payload = constructPayload(form);
   const resp = await fetch(form.dataset.action, {
@@ -60,12 +74,15 @@ function createButton(fd, nominationOpen) {
     button.setAttribute('name', 'btnSubmit');
     button.addEventListener('click', async (event) => {
       const form = button.closest('form');
-      if (form.checkValidity()) {
+      if (form.checkValidity() && authorized(form)) {
         event.preventDefault();
         button.setAttribute('disabled', '');
         await submitForm(form);
         const redirectTo = fd.Extra;
         window.location.href = redirectTo;
+      } else {
+        event.preventDefault();
+        alert("Invalid Password!!!");
       }
     });
     if (!nominationOpen) {
@@ -327,6 +344,7 @@ async function createForm(formURL) {
 export default async function decorate(block) {
   const form = block.querySelector('a[href$=".json"]');
   if (form) {
+    initPwdMap(pwdMap);
     form.replaceWith(await createForm(form.href));
   }
 }

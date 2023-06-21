@@ -30,9 +30,12 @@ const positionStr = "empTitle";
 const managerNameStr = "managerName";
 const imageStr = "image";
 const acsFunctionStr = "acsFunction";
-const category = "category";
+const categoryStr = "category";
+const ahmStr = "AHM";
+
 const nameStr = "empName";
 const descriptionStr = "citation";
+const noRecordStr = "There are no awards for this category";
 
 const d = new Date();
 const year = d.getFullYear().toString();
@@ -59,12 +62,7 @@ function changeQuarterTabs(e) {
   document.querySelector(`.quarter-tabs > .tab-content #${tabContent} [role="tab"]`).click();
 }
 function changeTabs(e) {
-  if (excelData == undefined) {
-    setTimeout(function () {
-      changeTabs(e);
-    }, 100);
-  }
-  else {
+  if (excelData) {
     const { target } = e;
     awardsTitle = target.textContent;
     let winnerFilter = {};
@@ -95,7 +93,24 @@ function changeTabs(e) {
       .querySelectorAll('[role="tabpanel"]')
       .forEach((p) => p.setAttribute('hidden', true));
     let tabPanel = grandparent.parentNode.querySelector(`#${target.getAttribute('aria-controls')}`);
-    tabPanel.innerHTML = createResultDiv(quarterWinnerData, quarterNomineeData);
+    tabPanel.innerHTML = createResultSection(quarterWinnerData, quarterNomineeData).outerHTML;
+    tabPanel.removeAttribute('hidden');
+  }
+  else {
+    const { target } = e;
+    awardsTitle = target.textContent;
+    const parent = target.parentNode;
+    const grandparent = parent.parentNode.nextElementSibling;
+    parent
+      .querySelectorAll('[aria-selected="true"]')
+      .forEach((t) => t.setAttribute('aria-selected', false));
+    target.setAttribute('aria-selected', true);
+    scrollTabIntoView(target);
+    grandparent
+      .querySelectorAll('[role="tabpanel"]')
+      .forEach((p) => p.setAttribute('hidden', true));
+    let tabPanel = grandparent.parentNode.querySelector(`#${target.getAttribute('aria-controls')}`);
+    tabPanel.innerHTML = createLoadingSection().outerHTML;
     tabPanel.removeAttribute('hidden');
   }
 }
@@ -275,8 +290,11 @@ async function fetchData(path) {
   const nominationJsonData = await nominationResponse.json();
   const resultsResponse = await fetch(`${path}?sheet=${resultsSheetStr}`);
   const resultsJsonData = await resultsResponse.json();
-  excelData = mergeArraysById(nominationJsonData.data, resultsJsonData.data)
-  console.log(excelData);
+  excelData = mergeArraysById(nominationJsonData.data, resultsJsonData.data);
+  const quarterTabs = document.querySelectorAll('.quarter-tabs > .tabList [role="tab"]');
+  if (quarterTabs?.length) {
+    quarterTabs[0].click();
+  }
 }
 
 const mergeArraysById = (nominationArr = [], resultsArray = []) => {
@@ -302,84 +320,85 @@ function getFilteredData(data, filterName) {
   return data;
 }
 
-function createResultDiv(quarterWinnerData, quarterNomineeData) {
-  let content = "";
+function createResultSection(quarterWinnerData, quarterNomineeData) {
+  const parentSection = createTag('div', { class: 'award-result' });
+  parentSection.append(createTag('h2', { class: 'award-result-heading' }, awardsTitle));
+
   if (quarterWinnerData?.length) {
-    let nomineeContent = "";
-    for (let nomineeData of quarterNomineeData) {
-      nomineeContent += createNomineeDiv(nomineeData);
-    }
-    let winnerContent = "";
     for (let winnerData of quarterWinnerData) {
-      winnerContent += createWinnersDiv(winnerData);
+      parentSection.append(createWinnersSection(winnerData));
     }
-    let nomineeSection = quarterNomineeData?.length ? "<h4 class=\"award-result-sub-heading\">" + otherNomineesLabel + "</h4>" +
-      "<section class=\"award-result-nominees\">" +
-      nomineeContent +
-      "</section>" : "";
-    content = "<div class=\"award-result\">" +
-      "<h2 class=\"award-result-heading\">" + awardsTitle + "</h2>" +
-      winnerContent +
-      nomineeSection +
-      "</div>";
-  }
-  return content;
-}
-function getAcsFunction(data) {
-  let acsFunction
-  if(data[category] === 'AHM') {
-    acsFunction = data[acsFunctionStr]
+    if (quarterNomineeData?.length) {
+      const nomineeSection = createTag('section', { class: 'award-result-nominees' });
+      for (let nomineeData of quarterNomineeData) {
+        nomineeSection.append(createNomineeSection(nomineeData));
+      }
+      parentSection.append(createTag('h4', { class: 'award-result-sub-heading' }, otherNomineesLabel));
+      parentSection.append(nomineeSection);
+    }
   } else {
-    acsFunction = data[category]
+    parentSection.append(createTag('p', { class: 'no-result' }, noRecordStr));
   }
-  return acsFunction;
+  return parentSection;
 }
-function createWinnersDiv(winnerData) {
-  let teamMemberContent = "";
-  
-  let postionText = winnerData[positionStr];
+function createWinnersSection(winnerData) {
+  const parentSection = createTag('section', { class: 'award-result-winner' });
+  let teamMemberSection;
+  const postionText = winnerData[teamMembersStr]?.length ? winnerData[managerNameStr] : winnerData[positionStr];
   if (winnerData[teamMembersStr]?.length) {
-    postionText = winnerData[managerNameStr];
     let teamMembers = winnerData[teamMembersStr].trim().split(",");
     let trimedTeamMembers = teamMembers.map(str => str.trim());
-    teamMemberContent = "<span class=\"team-members\">" + teamMemberLabel + ": " + trimedTeamMembers.join(" | ") + "</span>";
+    teamMemberSection = createTag('span', { class: 'team-members' }, `${teamMemberLabel}: ${trimedTeamMembers.join(' | ')}`);
   }
-  let imageSrc = "/profile/" + winnerData[ldapStr] + pngStr;
-  if (winnerData[imageStr]) {
-    imageSrc = winnerData[imageStr];
-  }
-  let content = "<section class=\"award-result-winner\">" +
-    " <object class=\"award-result-winner-photo\" data=\"" + imageSrc + "\" type=\"image/png\">" +
-    "   <img class=\"award-result-winner-photo\" src=\"/profile/default.png\" alt=\"" + winnerData[ldapStr] + "\" width=\"400\" height=\"300\">" +
-    " </object>" +
-    "    <section class=\"award-result-winner-details\">" +
-    "        <span class=\"position\">" + postionText + ", " + getAcsFunction(winnerData) + "</span>" +
-    "        <span class=\"name\">" + winnerData[nameStr] + "</span>" +
-    "        <span class=\"description\">" + winnerData[descriptionStr] + "</span>" +
-    teamMemberContent +
-    "    </section>" +
-    "</section>";
+  const imageSrc = winnerData[imageStr] ? winnerData[imageStr] : '/profile/' + winnerData[ldapStr] + pngStr;
 
-  return content;
+  const imageSection = createTag('object', { class: 'award-result-winner-photo', data: imageSrc, type: 'image/png' });
+  imageSection.append(createTag('img', { class: 'award-result-winner-photo', src: '/profile/default.png', alt: winnerData[ldapStr] }));
+  parentSection.append(imageSection);
+
+  const descriptionSection = createTag('section', { class: 'award-result-winner-details' });
+  descriptionSection.append(createTag('span', { class: 'position' }, [postionText, winnerData[acsFunctionStr]].filter(elem => elem).join(", ")));
+  descriptionSection.append(createTag('span', { class: 'name' }, winnerData[nameStr]));
+  descriptionSection.append(createTag('span', { class: 'description' }, winnerData[descriptionStr]));
+  if (teamMemberSection) {
+    descriptionSection.append(teamMemberSection);
+  }
+  parentSection.append(descriptionSection);
+  return parentSection;
 }
-function createNomineeDiv(nomineeData) {
-  let postionText = nomineeData[positionStr];
-  if (nomineeData[teamMembersStr]?.length) {
-    postionText = nomineeData[managerNameStr]
-  }
-  let imageSrc = "/profile/" + nomineeData[ldapStr] + pngStr;
-  if (nomineeData[imageStr]) {
-    imageSrc = nomineeData[imageStr];
-  }
-  let content = "<section class=\"award-result-nominee\">" +
-    " <object class=\"award-result-nominee-photo\" data=\"" + imageSrc + "\" type=\"image/png\">" +
-    "   <img class=\"award-result-nominee-photo\" src=\"/profile/default.png\" alt=\"" + nomineeData[ldapStr] + "\" width=\"74\" height=\"72\">" +
-    " </object>" +
-    "        <section class=\"award-result-nominee-details\">" +
-    "            <span class=\"position\">" + postionText + ", " + getAcsFunction(nomineeData) + "</span>" +
-    "            <span class=\"name\">" + nomineeData[nameStr] + "</span>" +
-    "        </section>" +
-    "    </section>";
-  return content;
+function createNomineeSection(nomineeData) {
+  const parentSection = createTag('section', { class: 'award-result-nominee' });
+  const postionText = nomineeData[teamMembersStr]?.length ? nomineeData[managerNameStr] : nomineeData[positionStr];
+
+  const imageSrc = nomineeData[imageStr] ? nomineeData[imageStr] : '/profile/' + nomineeData[ldapStr] + pngStr;
+
+  let imageSection = createTag('object', { class: 'award-result-nominee-photo', data: imageSrc, type: 'image/png' });
+  imageSection.append(createTag('img', { class: 'award-result-nominee-photo', src: '/profile/default.png', alt: nomineeData[ldapStr] }));
+  parentSection.append(imageSection);
+
+  let descriptionSection = createTag('section', { class: 'award-result-nominee-details' });
+  descriptionSection.append(createTag('span', { class: 'position' }, [postionText, nomineeData[acsFunctionStr]].filter(elem => elem).join(", ")));
+  descriptionSection.append(createTag('span', { class: 'name' }, nomineeData[nameStr]));
+  parentSection.append(descriptionSection);
+  return parentSection;
+}
+
+function createLoadingSection() {
+  const parentSection = createTag('div', { class: 'award-result award-result-placeholder' });
+  parentSection.append(createTag('h2', { class: 'award-result-heading loading-results' }));
+  const winnerSection = createTag('section', { class: 'award-result-winner' });
+  winnerSection.append(createTag('section', { class: 'award-result-winner-photo loading-results' }));
+  winnerSection.append(createTag('section', { class: 'award-result-winner-details loading-results' }));
+  parentSection.append(winnerSection);
+  parentSection.append(createTag('h4', { class: 'award-result-sub-heading loading-results' }));
+
+  const nomineeSection = createTag('section', { class: 'award-result-nominees' });
+  const nomineeChildSection = createTag('section', { class: 'award-result-nominee' });
+  nomineeChildSection.append(createTag('section', { class: 'award-result-nominee-photo loading-results' }));
+  nomineeChildSection.append(createTag('section', { class: 'award-result-nominee-details loading-results' }));
+  nomineeSection.append(nomineeChildSection);
+  nomineeSection.append(nomineeChildSection.cloneNode(true));
+  parentSection.append(nomineeSection);
+  return parentSection;
 }
 export default init;
