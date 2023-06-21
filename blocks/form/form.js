@@ -208,14 +208,14 @@ function showHideSubmitButton(configEntry) {
   const endDate = excelDateToJSDate(configEntry.endDate);
   const startDate = excelDateToJSDate(configEntry.startDate);
   let btnSubmit = document.getElementsByName('btnSubmit')[0];
-  if (startDate <= CURRENT_DATE && endDate < CURRENT_DATE) {
-    btnSubmit.setAttribute('disabled', '');
-    btnSubmit.classList.remove('button');
-    btnSubmit.classList.add('disabledButton')
-  } else {
+  if (CURRENT_DATE.toDateString() >= startDate.toDateString() && CURRENT_DATE.toDateString() <= endDate.toDateString()) {
     btnSubmit.removeAttribute('disabled');
     btnSubmit.classList.remove('disabledButton');
     btnSubmit.classList.contains('button') ? '' : btnSubmit.classList.add('button');
+  } else {
+    btnSubmit.setAttribute('disabled', '');
+    btnSubmit.classList.remove('button');
+    btnSubmit.classList.add('disabledButton')
   }
 }
 function excelDateToJSDate(serial) {
@@ -236,7 +236,7 @@ function showNominationStatus(records) {
   records.data.forEach((record) => {
     let nominationEndDate = excelDateToJSDate(record.endDate);
     let nominationStartDate = excelDateToJSDate(record.startDate);
-    if (CURRENT_DATE >= nominationStartDate && CURRENT_DATE < nominationEndDate) {
+    if (CURRENT_DATE.toDateString() >= nominationStartDate.toDateString() && CURRENT_DATE.toDateString() <= nominationEndDate.toDateString()) {
       var nominationInfo = document.createElement('p');
       nominationInfo.textContent = 'Nominations are open for ' + record.category + ' until ' + nominationEndDate.toDateString();
       nominationInfo.style.color = 'green';
@@ -267,12 +267,10 @@ async function createForm(formURL) {
   //const endDate = new Date(BEGIN_DATE.getTime() + (records.data[0].endDate * MILISECONDS_PER_DAY)); // Calculate end date by adding milliseconds
   const endDate = excelDateToJSDate(records.data[0].endDate);
   const startDate = excelDateToJSDate(records.data[0].startDate);
-  if (CURRENT_DATE >= startDate && CURRENT_DATE < endDate) {
-    //TODO set a flag 
+  if (CURRENT_DATE.toDateString() >= startDate.toDateString() && CURRENT_DATE.toDateString() <= endDate.toDateString()) {
     console.debug('current date in range , nomination open')
     nominationOpen = true;
   } else {
-    //TODO unset a flag 
     console.debug('current date not range , nomination closed')
     nominationOpen = false;
   }
