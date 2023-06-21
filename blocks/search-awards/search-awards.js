@@ -138,7 +138,7 @@ function createFilterDOM(elm) {
             const filterOptionContainer = createTag('div', { class: 'filter-list-item-container' });
             const selectedButton = createTag('button', { class: 'filter-list-item-selected', role: 'button', 'data-filter-id': filter.id });
             selectedButton.append(createTag('span', { class: 'selected-text' }, filter.selected));
-            selectedButton.append(createTag('img', { class: 'chevron-icon', src: '/blocks/search-awards/chevron.svg', width: '10', height: '10', alt: 'chevron' }));
+            selectedButton.append(createTag('img', { class: 'chevron-icon', src: '/img/chevron-up.svg', width: '12', height: '8', alt: 'chevron' }));
             filterOptionContainer.append(selectedButton);
             const filterOptionSection = createTag('div', { class: 'filter-list-item-options' });
             for (let option of filter.options) {
