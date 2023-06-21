@@ -41,6 +41,7 @@
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  row-gap: 24px;
 }
 
 .search-awards .filter-list .filter-list-item {
@@ -67,24 +68,12 @@
   font-size: 14px;
 }
 
-.search-awards .filter-list .filter-list-item .filter-list-item-options {
-  position: absolute;
-  background: #FAFAFA;
-  border: 1px solid #CACACA;
-  border-top: none;
-  line-height: 1;
-  z-index: 1;
-  width: 100%;
-  border-radius: 0 0 4px 4px;
-}
-
 .search-awards .filter-list .filter-list-item .filter-list-item-container {
   background: #FAFAFA;
   border: none;
   line-height: 1;
   align-self: flex-start;
   width: 70%;
-  max-width: 200px;
   position: relative;
 }
 
@@ -97,15 +86,17 @@
   justify-content: flex-start;
   align-items: center;
 }
+
 .search-awards .filter-list .filter-list-item .filter-list-item-container button.filter-list-item-selected {
   border: 1px solid #CACACA;
   border-radius: 4px;
 }
 
-.search-awards .filter-list .filter-list-item .filter-list-item-container.active button.filter-list-item-selected{
+.search-awards .filter-list .filter-list-item .filter-list-item-container.active button.filter-list-item-selected {
   border-radius: 4px 4px 0 0;
-  border-bottom: none;
+  border-bottom: 1px solid transparent;
 }
+
 .search-awards .filter-list .filter-list-item .filter-list-item-container button.filter-list-item-selected img {
   margin-left: 8px;
 }
@@ -121,7 +112,25 @@
 .search-awards .filter-list .filter-list-item .filter-list-item-container.active .filter-list-item-options {
   display: flex;
   flex-direction: column;
-  width: calc(100% - 1px);
+}
+
+.search-awards .filter-list .filter-list-item .filter-list-item-options {
+  position: absolute;
+  background: #FAFAFA;
+  line-height: 1;
+  z-index: 1;
+  width: 100%;
+  right: 0;
+}
+
+.search-awards .filter-list .filter-list-item .filter-list-item-options button {
+  border-left: 1px solid #CACACA;
+  border-right: 1px solid #CACACA;
+}
+
+.search-awards .filter-list .filter-list-item .filter-list-item-options button:last-child {
+  border-bottom: 1px solid #CACACA;
+  border-radius: 0 0 4px 4px;
 }
 
 .search-awards .search-results .search-results-load-more {
@@ -189,11 +198,22 @@
   .search-awards .filter-list .filter-list-item .filter-list-item-container {
     font-size: 12px;
   }
+
+  .search-awards .filter-list .filter-list-item .filter-list-item-category {
+    width: 50px;
+  }
 }
 
 @media screen and (min-width: 768px) and (max-width: 1024px) {
   .search-awards .search-results .search-results-winners {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .search-awards .filter-list .filter-list-item {
+    width: calc(50% - 8px);
+  }
+  .search-awards .filter-list .filter-list-item .filter-list-item-category {
+    width: 50px;
   }
 }
 

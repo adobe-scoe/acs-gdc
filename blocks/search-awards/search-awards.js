@@ -269,7 +269,6 @@ function camelize(str) {
 function initFilters(elm) {
     document.addEventListener("click", (evt) => {
         const {target} = evt;
-        console.log(target.tagName);
         if(target.tagName !== 'BUTTON' && target.parentNode.tagName !== 'BUTTON' ){
             searchAwardsDOM.querySelectorAll('.filter-list-item-container')
             .forEach((t) => {
