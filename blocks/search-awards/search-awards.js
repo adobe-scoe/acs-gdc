@@ -267,6 +267,16 @@ function camelize(str) {
 }
 
 function initFilters(elm) {
+    document.addEventListener("click", (evt) => {
+        const {target} = evt;
+        console.log(target.tagName);
+        if(target.tagName !== 'BUTTON' && target.parentNode.tagName !== 'BUTTON' ){
+            searchAwardsDOM.querySelectorAll('.filter-list-item-container')
+            .forEach((t) => {
+                t.classList.remove('active');
+            });
+        }
+    });
     const filters = elm.querySelectorAll('[role="filter"]');
     filters.forEach((filter) => {
         filter.addEventListener('click', toggleFilter);
