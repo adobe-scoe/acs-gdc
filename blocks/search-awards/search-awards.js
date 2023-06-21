@@ -137,7 +137,7 @@ function createFilterDOM(elm) {
             filterSection.append(createTag('p', { class: 'filter-list-item-category' }, filter.name));
             const filterOptionContainer = createTag('div', { class: 'filter-list-item-container' });
             const selectedButton = createTag('button', { class: 'filter-list-item-selected', role: 'button', 'data-filter-id': filter.id });
-            selectedButton.append(createTag('span', { class: 'selected-text' }, filter.selected));
+            selectedButton.append(createTag('span', { class: 'selected-text', title: filter.selected }, filter.selected));
             selectedButton.append(createTag('img', { class: 'chevron-icon', src: '/img/chevron-up.svg', width: '12', height: '8', alt: 'chevron' }));
             filterOptionContainer.append(selectedButton);
             const filterOptionSection = createTag('div', { class: 'filter-list-item-options' });
@@ -297,7 +297,9 @@ function changeFilters(e) {
     const { target } = e;
     const id = target.getAttribute('data-filter-by');
     const t = searchAwardsDOM.querySelector(`.filter-list-item-selected[data-filter-id=${id}]`);
-    t.querySelector(`.selected-text`).textContent = target.textContent;
+    const selectedText = t.querySelector(`.selected-text`);
+    selectedText.textContent = target.textContent;
+    selectedText.setAttribute('title', target.textContent);
     t.click();
     updateFilter(id, target.textContent.trim());
 }
