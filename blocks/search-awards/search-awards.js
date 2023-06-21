@@ -88,13 +88,13 @@ async function fetchData(dataPath, selectedCategory) {
     const resultsJsonData = await resultsResponse.json();
     incomingData = mergeArraysById(nominationJsonData.data, resultsJsonData.data);
     const endDate = new Date().getTime();
-    console.log("Data loaded in ", (endDate - startDate)/1000, 'sec');
+    console.log("Data loaded in ", (endDate - startDate) / 1000, 'sec');
     toggleLoadingSection();
     createFilterByOptions(selectedCategory);
     filteredData = getFilteredData(incomingData, filterBy);
     initFilters(createFilterDOM(searchAwardsDOM));
     initLoadMore(createResultDOM(searchAwardsDOM));
-    console.log("DOM loaded in ", (new Date().getTime() - endDate)/1000, 'sec');
+    console.log("DOM loaded in ", (new Date().getTime() - endDate) / 1000, 'sec');
 }
 
 const mergeArraysById = (nominationArr = [], resultsArray = []) => {
@@ -136,13 +136,13 @@ function createFilterDOM(elm) {
             filterSection = createTag('div', { class: 'filter-list-item' });
             filterSection.append(createTag('p', { class: 'filter-list-item-category' }, filter.name));
             const filterOptionContainer = createTag('div', { class: 'filter-list-item-container' });
-            const selectedButton = createTag('button', { class: 'filter-list-item-selected', role: 'filter', 'data-filter-id': filter.id });
+            const selectedButton = createTag('button', { class: 'filter-list-item-selected', role: 'button', 'data-filter-id': filter.id });
             selectedButton.append(createTag('span', { class: 'selected-text' }, filter.selected));
-            selectedButton.append(createTag('img', { class: 'chevron-icon', src: '/blocks/search-awards/chevron.svg', width: '10', height: '10' }));
+            selectedButton.append(createTag('img', { class: 'chevron-icon', src: '/blocks/search-awards/chevron.svg', width: '10', height: '10', alt: 'chevron' }));
             filterOptionContainer.append(selectedButton);
             const filterOptionSection = createTag('div', { class: 'filter-list-item-options' });
             for (let option of filter.options) {
-                filterOptionSection.append(createTag('button', { class: 'filter', role: 'filter-options', 'data-filter-by': filter.id }, option));
+                filterOptionSection.append(createTag('button', { class: 'filter', role: 'option', 'data-filter-by': filter.id }, option));
             }
             filterOptionContainer.append(filterOptionSection);
             filterSection.append(filterOptionContainer);
@@ -172,7 +172,7 @@ function createResultDOM(elm) {
         resultsSection.append(createLoadMoreResultsDOM(0, initialCountToShow));
         const loadMoreSection = createTag('div', { class: 'search-results-load-more' });
         loadMoreSection.append(createTag('p', { class: 'load-more-text' }, `Displaying ${initialCountToShow} out of ${filteredData.length}`));
-        loadMoreSection.append(createTag('button', { class: 'load-more-button', role: 'load' }, loadMoreStr));
+        loadMoreSection.append(createTag('button', { class: 'load-more-button' }, loadMoreStr));
         resultsSection.append(loadMoreSection);
     }
     else {
@@ -187,8 +187,8 @@ function createLoadMoreResultsDOM(i, j) {
         if (i <= index && index < j) {
             const winnerSection = createTag('div', { class: 'card-block', 'data-valign': 'middle' });
             const imageSrc = data[imageStr] ? data[imageStr] : '/profile/' + data[ldapStr] + pngStr;
-            const imageSection = createTag('object', { data: imageSrc, type: 'image/png' });
-            imageSection.append(createTag('img', { src: '/profile/default.png', alt: data[ldapStr] }));
+            const imageSection = createTag('object', { data: imageSrc, type: 'image/png', role: 'img', title: data[nameStr] });
+            imageSection.append(createTag('img', { src: '/profile/default.png', alt: data[nameStr] }));
             winnerSection.append(createTag('div', { class: 'card-image' }, imageSection));
             let details = createTag('div', { class: 'card-content' });
             details.append(createTag('p', { class: 'body-xs' }, `${data[yearStr]} - ${data[quarterStr]}`));
@@ -267,27 +267,27 @@ function camelize(str) {
 
 function initFilters(elm) {
     document.addEventListener("click", (evt) => {
-        const {target} = evt;
-        if(target.tagName !== 'BUTTON' && target.parentNode.tagName !== 'BUTTON' ){
+        const { target } = evt;
+        if (target.tagName !== 'BUTTON' && target.parentNode.tagName !== 'BUTTON') {
             searchAwardsDOM.querySelectorAll('.filter-list-item-container')
-            .forEach((t) => {
-                t.classList.remove('active');
-            });
+                .forEach((t) => {
+                    t.classList.remove('active');
+                });
         }
     });
-    const filters = elm.querySelectorAll('[role="filter"]');
+    const filters = elm.querySelectorAll('[role="button"]');
     filters.forEach((filter) => {
         filter.addEventListener('click', toggleFilter);
     });
 
-    const filterOptions = elm.querySelectorAll('[role="filter-options"]');
+    const filterOptions = elm.querySelectorAll('[role="option"]');
     filterOptions.forEach((option) => {
         option.addEventListener('click', changeFilters);
     });
 }
 
 function initLoadMore(elm) {
-    const loadMore = elm.querySelectorAll('[role="load"]');
+    const loadMore = elm.querySelectorAll('button.load-more-button');
     loadMore.forEach((load) => {
         load.addEventListener('click', loadMoreResults);
     });
