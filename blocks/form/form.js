@@ -236,7 +236,7 @@ function showNominationStatus(records) {
   records.data.forEach((record) => {
     let nominationEndDate = excelDateToJSDate(record.endDate);
     let nominationStartDate = excelDateToJSDate(record.startDate);
-    if (CURRENT_DATE >= nominationStartDate && CURRENT_DATE < nominationEndDate) {
+    if (CURRENT_DATE.toDateString() >= nominationStartDate.toDateString() && CURRENT_DATE.toDateString() <= nominationEndDate.toDateString()) {
       var nominationInfo = document.createElement('p');
       nominationInfo.textContent = 'Nominations are open for ' + record.category + ' until ' + nominationEndDate.toDateString();
       nominationInfo.style.color = 'green';
@@ -267,7 +267,7 @@ async function createForm(formURL) {
   //const endDate = new Date(BEGIN_DATE.getTime() + (records.data[0].endDate * MILISECONDS_PER_DAY)); // Calculate end date by adding milliseconds
   const endDate = excelDateToJSDate(records.data[0].endDate);
   const startDate = excelDateToJSDate(records.data[0].startDate);
-  if (CURRENT_DATE >= startDate && CURRENT_DATE < endDate) {
+  if (CURRENT_DATE.toDateString() >= startDate.toDateString() && CURRENT_DATE.toDateString() <= endDate.toDateString()) {
     //TODO set a flag 
     console.debug('current date in range , nomination open')
     nominationOpen = true;
