@@ -208,14 +208,14 @@ function showHideSubmitButton(configEntry) {
   const endDate = excelDateToJSDate(configEntry.endDate);
   const startDate = excelDateToJSDate(configEntry.startDate);
   let btnSubmit = document.getElementsByName('btnSubmit')[0];
-  if (startDate <= CURRENT_DATE && endDate < CURRENT_DATE) {
-    btnSubmit.setAttribute('disabled', '');
-    btnSubmit.classList.remove('button');
-    btnSubmit.classList.add('disabledButton')
-  } else {
+  if (CURRENT_DATE.toDateString() >= startDate.toDateString() && CURRENT_DATE.toDateString() <= endDate.toDateString()) {
     btnSubmit.removeAttribute('disabled');
     btnSubmit.classList.remove('disabledButton');
     btnSubmit.classList.contains('button') ? '' : btnSubmit.classList.add('button');
+  } else {
+    btnSubmit.setAttribute('disabled', '');
+    btnSubmit.classList.remove('button');
+    btnSubmit.classList.add('disabledButton')
   }
 }
 function excelDateToJSDate(serial) {
@@ -268,11 +268,9 @@ async function createForm(formURL) {
   const endDate = excelDateToJSDate(records.data[0].endDate);
   const startDate = excelDateToJSDate(records.data[0].startDate);
   if (CURRENT_DATE.toDateString() >= startDate.toDateString() && CURRENT_DATE.toDateString() <= endDate.toDateString()) {
-    //TODO set a flag 
     console.debug('current date in range , nomination open')
     nominationOpen = true;
   } else {
-    //TODO unset a flag 
     console.debug('current date not range , nomination closed')
     nominationOpen = false;
   }
