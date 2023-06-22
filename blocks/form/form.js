@@ -1,5 +1,5 @@
 const FUNCTIONAL = 'Functional';
-const CURRENT_DATE = new Date(); // Get current date
+const CURRENT_DATE = getDateOnlyFromDate(new Date()); // Get current date in mm-dd-yyyy format
 const CURRENT_DATA_TIME_MILLISECONDS = Date.now();
 
 let pwdMap = {}
@@ -208,7 +208,7 @@ function showHideSubmitButton(configEntry) {
   const endDate = excelDateToJSDate(configEntry.endDate);
   const startDate = excelDateToJSDate(configEntry.startDate);
   let btnSubmit = document.getElementsByName('btnSubmit')[0];
-  if (CURRENT_DATE.toDateString() >= startDate.toDateString() && CURRENT_DATE.toDateString() <= endDate.toDateString()) {
+  if (CURRENT_DATE >= getDateOnlyFromDate(startDate) && CURRENT_DATE <= getDateOnlyFromDate(endDate)) {
     btnSubmit.removeAttribute('disabled');
     btnSubmit.classList.remove('disabledButton');
     btnSubmit.classList.contains('button') ? '' : btnSubmit.classList.add('button');
@@ -231,19 +231,26 @@ function excelDateToJSDate(serial) {
   return new Date(date_info.getFullYear(), date_info.getMonth(), date_info.getDate(), hours, minutes, seconds);
 
 }
+
+// fucntion to get date value in mm-dd-yyyy format
+function getDateOnlyFromDate(dateVal){
+  return dateVal.getMonth()+1+'-'+dateVal.getDate()+'-'+dateVal.getFullYear();
+
+}
 function showNominationStatus(records) {
   var formInfoDom = document.createElement('div');
   records.data.forEach((record) => {
     let nominationEndDate = excelDateToJSDate(record.endDate);
     let nominationStartDate = excelDateToJSDate(record.startDate);
-    if (CURRENT_DATE.toDateString() >= nominationStartDate.toDateString() && CURRENT_DATE.toDateString() <= nominationEndDate.toDateString()) {
-      var nominationInfo = document.createElement('p');
+    var nominationInfo = document.createElement('p');
+    if (CURRENT_DATE >= getDateOnlyFromDate(nominationStartDate) && CURRENT_DATE <= getDateOnlyFromDate(nominationEndDate)) {
       nominationInfo.textContent = 'Nominations are open for ' + record.category + ' until ' + nominationEndDate.toDateString();
       nominationInfo.style.color = 'green';
-
-    } else {
-      var nominationInfo = document.createElement('p');
-      nominationInfo.textContent = 'Nomination has been closed' + ' for ' + record.category + ' on ' + nominationEndDate.toDateString();
+    } else if(CURRENT_DATE < getDateOnlyFromDate(nominationStartDate) && CURRENT_DATE < getDateOnlyFromDate(nominationEndDate)){
+      nominationInfo.textContent = 'Nomination will start for ' + record.category + ' from ' + nominationEndDate.toDateString();
+      nominationInfo.style.color = 'orange';
+    } else if(CURRENT_DATE > getDateOnlyFromDate(nominationStartDate) && CURRENT_DATE > getDateOnlyFromDate(nominationEndDate)) {
+      nominationInfo.textContent = 'Nomination has been closed for ' + record.category + ' on ' + nominationEndDate.toDateString();
       nominationInfo.style.color = 'red';
     }
     formInfoDom.append(nominationInfo);
@@ -263,18 +270,7 @@ async function createForm(formURL) {
   console.debug(checkValidityFormURL);
   const validityresp = await fetch(checkValidityFormURL, { cache: 'no-cache', mode: 'cors' });
   records = await validityresp.json();
-  console.debug(records);
-  //const endDate = new Date(BEGIN_DATE.getTime() + (records.data[0].endDate * MILISECONDS_PER_DAY)); // Calculate end date by adding milliseconds
-  const endDate = excelDateToJSDate(records.data[0].endDate);
-  const startDate = excelDateToJSDate(records.data[0].startDate);
-  if (CURRENT_DATE.toDateString() >= startDate.toDateString() && CURRENT_DATE.toDateString() <= endDate.toDateString()) {
-    console.debug('current date in range , nomination open')
-    nominationOpen = true;
-  } else {
-    console.debug('current date not range , nomination closed')
-    nominationOpen = false;
-  }
-
+ 
   const resp = await fetch(pathname);
   const json = await resp.json();
   const form = document.createElement('form');
