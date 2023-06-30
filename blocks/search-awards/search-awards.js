@@ -20,8 +20,8 @@ let filteredData;
 let filterBy = [];
 let searchAwardsDOM;
 let winnersSectionDOM;
-const initialCountToShow = 3;
-const incrementalCountToShow = 3;
+let initialCountToShow = 6;
+let incrementalCountToShow = 6;
 let resultCount = initialCountToShow;
 
 
@@ -68,6 +68,16 @@ const init = (block) => {
         const rowsSearchAwards = searchAwardsDOM.querySelectorAll(':scope > div');
         rowsSearchAwards.forEach((row) => {
             const key = getStringKeyName(row.children[0].textContent);
+            if (key === 'default-display-count') {
+                let val = row.children[1].textContent;
+                initialCountToShow = val;
+                row.remove();
+            }
+             if (key === 'load-more--count') {
+                let val = row.children[1].textContent;
+                incrementalCountToShow = val;
+                row.remove();
+            }
             if (key === 'path') {
                 let val = row.children[1].textContent;
                 fetchData(categoryMap[val], val);
@@ -88,13 +98,13 @@ async function fetchData(dataPath, selectedCategory) {
     const resultsJsonData = await resultsResponse.json();
     incomingData = mergeArraysById(nominationJsonData.data, resultsJsonData.data);
     const endDate = new Date().getTime();
-    console.log("Data loaded in ", (endDate - startDate) / 1000, 'sec');
+    console.debug("Data loaded in ", (endDate - startDate) / 1000, 'sec');
     toggleLoadingSection();
     createFilterByOptions(selectedCategory);
     filteredData = getFilteredData(incomingData, filterBy);
     initFilters(createFilterDOM(searchAwardsDOM));
     initLoadMore(createResultDOM(searchAwardsDOM));
-    console.log("DOM loaded in ", (new Date().getTime() - endDate) / 1000, 'sec');
+    console.debug("DOM loaded in ", (new Date().getTime() - endDate) / 1000, 'sec');
 }
 
 const mergeArraysById = (nominationArr = [], resultsArray = []) => {
@@ -192,7 +202,7 @@ function createLoadMoreResultsDOM(i, j) {
             winnerSection.append(createTag('div', { class: 'card-image' }, imageSection));
             let details = createTag('div', { class: 'card-content' });
             details.append(createTag('p', { class: 'body-xs' }, `${data[yearStr]} - ${data[quarterStr]}`));
-            details.append(createTag('h2', { class: 'heading-xs' }, data[awardStr]));
+            details.append(createTag('p', { class: 'body-xs' }, data[awardStr]));
             details.append(createTag('h2', { class: 'heading-xs' }, data[nameStr]));
             winnerSection.append(details);
             winnersSectionDOM.append(createTag('div', { class: 'card-horizontal' }, createTag('div', { class: 'foreground' }, winnerSection)));
