@@ -91,11 +91,13 @@
   border: 1px solid #CACACA;
   border-radius: 4px;
 }
-.search-awards .filter-list .filter-list-item .filter-list-item-container button.filter-list-item-selected .selected-text{
+
+.search-awards .filter-list .filter-list-item .filter-list-item-container button.filter-list-item-selected .selected-text {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
 }
+
 .search-awards .filter-list .filter-list-item .filter-list-item-container.active button.filter-list-item-selected {
   border-radius: 4px 4px 0 0;
   border-bottom: 1px solid transparent;
@@ -216,6 +218,7 @@
   .search-awards .filter-list .filter-list-item {
     width: calc(50% - 8px);
   }
+
   .search-awards .filter-list .filter-list-item .filter-list-item-category {
     width: 50px;
   }

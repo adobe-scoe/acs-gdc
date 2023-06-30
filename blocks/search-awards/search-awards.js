@@ -73,7 +73,7 @@ const init = (block) => {
                 initialCountToShow = val;
                 row.remove();
             }
-             if (key === 'load-more--count') {
+            if (key === 'load-more-count') {
                 let val = row.children[1].textContent;
                 incrementalCountToShow = val;
                 row.remove();
