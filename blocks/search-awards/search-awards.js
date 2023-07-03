@@ -71,6 +71,7 @@ const init = (block) => {
             if (key === 'default-display-count') {
                 let val = row.children[1].textContent;
                 initialCountToShow = val;
+                resultCount = initialCountToShow;
                 row.remove();
             }
             if (key === 'load-more-count') {
