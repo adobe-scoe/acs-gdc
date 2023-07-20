@@ -29,62 +29,64 @@ const init = (block) => {
     const rootElem = block.closest('.fragment') || document;
     const allSections = Array.from(rootElem.querySelectorAll('div.section'));
     allSections.forEach((e, i) => {
-        let categoryMap = {};
-        let categoryId;
-        const filterSectionMetadata = e.querySelectorAll(':scope > .section-metadata');
-        if (!filterSectionMetadata) return;
-        filterSectionMetadata.forEach((f) => {
-            const className = f.className.replace('section-metadata', '');
-            if (className.includes("filter")) {
-                const rows = f.querySelectorAll(':scope > div');
-                let filter = {};
-                rows.forEach((row) => {
-                    if (row.children[0].textContent === 'options') {
-                        filter[row.children[0].textContent] = row.children[1].textContent.split(',').map(o => o.trim());
-                    }
-                    else {
-                        filter[row.children[0].textContent] = row.children[1].textContent;
-                    }
-                });
-                filterBy.push(filter);
-            }
-            if (className.includes("id-")) {
-                categoryId = className.replace('id-', '').trim();
-                const rows = f.querySelectorAll(':scope > div');
-                rows.forEach((row) => {
-                    categoryMap[row.children[0].textContent.trim()] = row.children[1].textContent.trim();
-                });
-            }
-            f.remove();
-        });
-        filterBy.map((fb) => {
-            if (fb.id === categoryId) {
-                fb['datapath'] = categoryMap;
-            }
-        });
-        filterBy.push({ name: 'Status', id: 'status', type: 'hidden', selected: 'Winner' });
-        searchAwardsDOM = rootElem.querySelector('.search-awards');
-        if (!searchAwardsDOM) return;
-        const rowsSearchAwards = searchAwardsDOM.querySelectorAll(':scope > div');
-        rowsSearchAwards.forEach((row) => {
-            const key = getStringKeyName(row.children[0].textContent);
-            if (key === 'default-display-count') {
-                let val = row.children[1].textContent;
-                initialCountToShow = val;
-                resultCount = initialCountToShow;
-                row.remove();
-            }
-            if (key === 'load-more-count') {
-                let val = row.children[1].textContent;
-                incrementalCountToShow = val;
-                row.remove();
-            }
-            if (key === 'path') {
-                let val = row.children[1].textContent;
-                fetchData(categoryMap[val], val);
-                row.remove();
-            }
-        });
+        if (e.firstElementChild.className.includes('search-awards')) {
+            let categoryMap = {};
+            let categoryId;
+            const filterSectionMetadata = e.querySelectorAll(':scope > .section-metadata');
+            if (!filterSectionMetadata) return;
+            filterSectionMetadata.forEach((f) => {
+                const className = f.className.replace('section-metadata', '');
+                if (className.includes("filter")) {
+                    const rows = f.querySelectorAll(':scope > div');
+                    let filter = {};
+                    rows.forEach((row) => {
+                        if (row.children[0].textContent === 'options') {
+                            filter[row.children[0].textContent] = row.children[1].textContent.split(',').map(o => o.trim());
+                        }
+                        else {
+                            filter[row.children[0].textContent] = row.children[1].textContent;
+                        }
+                    });
+                    filterBy.push(filter);
+                }
+                if (className.includes("id-")) {
+                    categoryId = className.replace('id-', '').trim();
+                    const rows = f.querySelectorAll(':scope > div');
+                    rows.forEach((row) => {
+                        categoryMap[row.children[0].textContent.trim()] = row.children[1].textContent.trim();
+                    });
+                }
+                f.remove();
+            });
+            filterBy.map((fb) => {
+                if (fb.id === categoryId) {
+                    fb['datapath'] = categoryMap;
+                }
+            });
+            filterBy.push({ name: 'Status', id: 'status', type: 'hidden', selected: 'Winner' });
+            searchAwardsDOM = rootElem.querySelector('.search-awards');
+            if (!searchAwardsDOM) return;
+            const rowsSearchAwards = searchAwardsDOM.querySelectorAll(':scope > div');
+            rowsSearchAwards.forEach((row) => {
+                const key = getStringKeyName(row.children[0].textContent);
+                if (key === 'default-display-count') {
+                    let val = row.children[1].textContent;
+                    initialCountToShow = val;
+                    resultCount = initialCountToShow;
+                    row.remove();
+                }
+                if (key === 'load-more-count') {
+                    let val = row.children[1].textContent;
+                    incrementalCountToShow = val;
+                    row.remove();
+                }
+                if (key === 'path') {
+                    let val = row.children[1].textContent;
+                    fetchData(categoryMap[val], val);
+                    row.remove();
+                }
+            });
+        }
     });
 };
 
