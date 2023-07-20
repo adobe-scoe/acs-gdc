@@ -1,7 +1,7 @@
 /* Top container CSS - START */
 .search-awards {
   width: var(--grid-container-width);
-  margin: 5rem auto;
+  margin: 0 auto;
 }
 
 .search-awards .search-results {
